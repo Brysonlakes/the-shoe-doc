@@ -184,8 +184,7 @@
         <div class="header">
             <h1>👟 <span>THE SHOE DOC</span></h1>
             <div>
-                <a href="index.html" class="btn">🏠 Home</a>
-                <a href="login.html" class="btn" onclick="logout()">🚪 Logout</a>
+                <a href="index.html" class="btn" onclick="logout()">🚪 Logout</a>
             </div>
         </div>
 
@@ -238,6 +237,13 @@
             return getData('shoeDocBookings', []);
         }
 
+        function logout() {
+            localStorage.removeItem('currentCustomer');
+            localStorage.removeItem('rememberedUser');
+            // Actually the click on the link already goes to index.html
+            // but we clear the data anyway.
+        }
+
         // ============================================================
         // LOAD DASHBOARD
         // ============================================================
@@ -245,7 +251,7 @@
             const customerData = localStorage.getItem('currentCustomer');
             if (!customerData) {
                 // Not logged in – redirect to login
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
                 return;
             }
 
@@ -259,7 +265,7 @@
             );
 
             // Welcome message
-            document.getElementById('customerName').textContent = customer.customer || 'Customer';
+            document.getElementById('customerName').textContent = customer.name || customer.customer || 'Customer';
 
             // Stats
             const total = customerBookings.length;
@@ -279,7 +285,7 @@
                     <div class="empty-state">
                         <div class="icon">📭</div>
                         <p>You haven't made any bookings yet.</p>
-                        <p><a href="index.html">Book your first cleaning now!</a></p>
+                        <p><a href="booking.html">Book your first cleaning now!</a></p>
                     </div>
                 `;
                 return;
@@ -316,17 +322,6 @@
             container.innerHTML = html;
         }
 
-        // ============================================================
-        // LOGOUT
-        // ============================================================
-        function logout() {
-            localStorage.removeItem('currentCustomer');
-            localStorage.removeItem('rememberedUser');
-        }
-
-        // ============================================================
-        // INIT
-        // ============================================================
         window.onload = loadDashboard;
     </script>
 </body>
