@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>THE SHOE DOC · Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #F9D976;
+            --gold-gradient: linear-gradient(135deg, #F9D976 0%, #D4AF37 50%, #B8860B 100%);
+            --gold-glow: 0 0 30px rgba(212, 175, 55, 0.3);
+            --dark-bg: #0A0A0A;
+            --dark-card: #141414;
+            --dark-surface: #1A1A1A;
+            --white: #FFFFFF;
+            --off-white: #E0E0E0;
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            --whatsapp: #25D366;
+        }
+        body {
+            font-family: var(--font-sans);
+            background: var(--dark-bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-wrapper {
+            width: 100%;
+            max-width: 440px;
+        }
+        .login-card {
+            background: var(--dark-card);
+            border-radius: 24px;
+            padding: 40px 32px;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .login-header .logo {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .login-header .subtitle {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+        /* Role Toggle */
+        .role-toggle {
+            display: flex;
+            background: var(--dark-surface);
+            border-radius: 50px;
+            padding: 4px;
+            margin-bottom: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .role-toggle button {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.3s;
+            background: transparent;
+            color: #888;
+        }
+        .role-toggle button.active {
+            background: var(--gold-gradient);
+            color: #000;
+            box-shadow: var(--gold-glow);
+        }
+        .role-toggle button:hover:not(.active) {
+            color: var(--white);
+        }
+        /* Form */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid #2a2a2a;
+            background: #0f0f0f;
+            color: #fff;
+            font-size: 1rem;
+            font-family: var(--font-sans);
+            transition: 0.3s;
+            outline: none;
+        }
+        .form-group input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+        }
+        .form-group input::placeholder {
+            color: #555;
+        }
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 16px 0 20px;
+            font-size: 0.85rem;
+        }
+        .form-options label {
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        .form-options label input[type="checkbox"] {
+            accent-color: var(--gold);
+            width: 16px;
+            height: 16px;
+        }
+        .form-options a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .form-options a:hover {
+            text-decoration: underline;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            background: var(--gold-gradient);
+            color: #000;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-login:hover {
+            transform: scale(1.02);
+            box-shadow: var(--gold-glow);
+        }
+        .error-msg {
+            color: #ff4d4d;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            text-align: center;
+            display: none;
+        }
+        .error-msg.show {
+            display: block;
+        }
+        .success-msg {
+            color: #28a745;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            text-align: center;
+            display: none;
+        }
+        .success-msg.show {
+            display: block;
+        }
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 0.8rem;
+        }
+        .login-footer a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+        /* Customer fields (hidden by default) */
+        .customer-fields {
+            display: none;
+        }
+        .customer-fields.show {
+            display: block;
+        }
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 28px 20px;
+            }
+            .login-header .logo {
+                font-size: 1.6rem;
+            }
+            .form-options {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+            <!-- Header -->
+            <div class="login-header">
+                <div class="logo">THE SHOE DOC</div>
+                <p class="subtitle">Sign in to your account</p>
+            </div>
+
+            <!-- Role Toggle -->
+            <div class="role-toggle">
+                <button class="active" data-role="admin" onclick="switchRole('admin')">👑 Admin</button>
+                <button data-role="customer" onclick="switchRole('customer')">👤 Customer</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <!-- Admin Fields -->
+                <div id="adminFields">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="adminUsername" placeholder="Enter username" value="admin" />
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="adminPassword" placeholder="Enter password" value="admin123" />
+                    </div>
+                </div>
+
+                <!-- Customer Fields -->
+                <div id="customerFields" class="customer-fields">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="customerEmail" placeholder="customer@email.com" />
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="customerPhone" placeholder="082 123 4567" />
+                    </div>
+                </div>
+
+                <!-- Options -->
+                <div class="form-options">
+                    <label>
+                        <input type="checkbox" id="rememberMe" /> Remember Me
+                    </label>
+                    <a href="#" id="forgotLink" onclick="forgotPassword(event)">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn-login">Sign In</button>
+
+                <div id="errorMsg" class="error-msg"></div>
+                <div id="successMsg" class="success-msg"></div>
+            </form>
+
+            <div class="login-footer">
+                <p>Don't have an account? <a href="index.html">Book Now</a></p>
+                <p style="margin-top: 4px; color: #444; font-size: 0.75rem;">© 2026 THE SHOE DOC</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        function getData(key, fallback) {
+            const data = localStorage.getItem(key);
+            if (data) { try { return JSON.parse(data); } catch (e) { return fallback; } }
+            return fallback;
+        }
+
+        function getAdminCreds() {
+            return getData('adminCreds', { username: 'admin', password: 'admin123' });
+        }
+
+        function getBookings() {
+            return getData('shoeDocBookings', []);
+        }
+
+        // ============================================================
+        // ROLE SWITCH
+        // ============================================================
+        let currentRole = 'admin';
+
+        function switchRole(role) {
+            currentRole = role;
+            document.querySelectorAll('.role-toggle button').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.role === role);
+            });
+            const adminFields = document.getElementById('adminFields');
+            const customerFields = document.getElementById('customerFields');
+            if (role === 'admin') {
+                adminFields.style.display = 'block';
+                customerFields.classList.remove('show');
+                document.querySelector('.login-header .subtitle').textContent = 'Sign in as Admin';
+            } else {
+                adminFields.style.display = 'none';
+                customerFields.classList.add('show');
+                document.querySelector('.login-header .subtitle').textContent = 'Sign in as Customer';
+            }
+            // Clear errors
+            document.getElementById('errorMsg').classList.remove('show');
+            document.getElementById('successMsg').classList.remove('show');
+        }
+
+        // ============================================================
+        // LOGIN HANDLER
+        // ============================================================
+        function handleLogin(e) {
+            e.preventDefault();
+            const errorEl = document.getElementById('errorMsg');
+            const successEl = document.getElementById('successMsg');
+            errorEl.classList.remove('show');
+            successEl.classList.remove('show');
+
+            if (currentRole === 'admin') {
+                // --- ADMIN LOGIN ---
+                const username = document.getElementById('adminUsername').value.trim();
+                const password = document.getElementById('adminPassword').value.trim();
+                const creds = getAdminCreds();
+
+                if (username === creds.username && password === creds.password) {
+                    successEl.textContent = '✅ Login successful! Redirecting...';
+                    successEl.classList.add('show');
+                    // Redirect to admin panel
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 800);
+                } else {
+                    errorEl.textContent = '❌ Invalid username or password.';
+                    errorEl.classList.add('show');
+                }
+
+            } else {
+                // --- CUSTOMER LOGIN ---
+                const email = document.getElementById('customerEmail').value.trim();
+                const phone = document.getElementById('customerPhone').value.trim();
+
+                if (!email && !phone) {
+                    errorEl.textContent = '❌ Please enter your email or phone number.';
+                    errorEl.classList.add('show');
+                    return;
+                }
+
+                const bookings = getBookings();
+                // Find customer by email or phone
+                const customer = bookings.find(b => 
+                    (email && b.email && b.email.toLowerCase() === email.toLowerCase()) ||
+                    (phone && b.phone && b.phone.replace(/\s/g, '') === phone.replace(/\s/g, ''))
+                );
+
+                if (customer) {
+                    successEl.textContent = `✅ Welcome back, ${customer.customer}! Redirecting...`;
+                    successEl.classList.add('show');
+                    // Store customer info for dashboard
+                    localStorage.setItem('currentCustomer', JSON.stringify(customer));
+                    // Redirect to customer dashboard
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 800);
+                } else {
+                    errorEl.textContent = '❌ No account found with that email or phone. Please book first.';
+                    errorEl.classList.add('show');
+                }
+            }
+
+            // Remember Me
+            if (document.getElementById('rememberMe').checked) {
+                localStorage.setItem('rememberedUser', currentRole === 'admin' ? 'admin' : 'customer');
+            } else {
+                localStorage.removeItem('rememberedUser');
+            }
+        }
+
+        // ============================================================
+        // FORGOT PASSWORD
+        // ============================================================
+        function forgotPassword(e) {
+            e.preventDefault();
+            const errorEl = document.getElementById('errorMsg');
+            const successEl = document.getElementById('successMsg');
+            errorEl.classList.remove('show');
+            successEl.classList.remove('show');
+
+            if (currentRole === 'admin') {
+                // For admin, just show a message
+                errorEl.textContent = '📧 Contact support to reset your admin password.';
+                errorEl.classList.add('show');
+            } else {
+                // For customers, check if email exists
+                const email = document.getElementById('customerEmail').value.trim();
+                if (!email) {
+                    errorEl.textContent = '❌ Please enter your email address first.';
+                    errorEl.classList.add('show');
+                    return;
+                }
+                const bookings = getBookings();
+                const customer = bookings.find(b => b.email && b.email.toLowerCase() === email.toLowerCase());
+                if (customer) {
+                    successEl.textContent = '📧 A password reset link has been sent to your email.';
+                    successEl.classList.add('show');
+                    // In reality, you'd send an email via EmailJS here
+                } else {
+                    errorEl.textContent = '❌ No account found with that email.';
+                    errorEl.classList.add('show');
+                }
+            }
+        }
+
+        // ============================================================
+        // ENTER KEY SUPPORT
+        // ============================================================
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                handleLogin(e);
+            }
+        });
+
+        // ============================================================
+        // REMEMBER ME
+        // ============================================================
+        window.onload = function() {
+            const remembered = localStorage.getItem('rememberedUser');
+            if (remembered === 'customer') {
+                switchRole('customer');
+            } else {
+                switchRole('admin');
+            }
+        };
+    </script>
+</body>
+</html>

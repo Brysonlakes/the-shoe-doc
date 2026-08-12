@@ -1,0 +1,16 @@
+# Ignore these folders and files
+salon-marketplace-app/
+shoe-doc-email-server/
+node_modules/
+favicon.iso.ico/
+LicenseKeyGeneratorSetup_1.0.exe
+Optical Retail POS.lnk
+SpazaInstaller/
+SpazaInventorySetup_1.0.exe
+*.exe
+*.lnk
+*.txt
+*.iso
+*.ico
+.DS_Store
+Thumbs.db
