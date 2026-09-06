@@ -25,7 +25,6 @@
             --off-white: #E0E0E0;
             --font-serif: 'Playfair Display', serif;
             --font-sans: 'Inter', sans-serif;
-            --whatsapp: #25D366;
         }
         body {
             font-family: var(--font-sans);
@@ -266,7 +265,7 @@
             color: #888;
             font-size: 1.8rem;
             cursor: pointer;
-            transition: var(--transition);
+            transition: 0.3s;
         }
         .modal-close:hover {
             color: var(--white);
@@ -482,7 +481,6 @@
             }
             document.getElementById('errorMsg').classList.remove('show');
             document.getElementById('successMsg').classList.remove('show');
-            // Clear password field for customer
             document.getElementById('customerPassword').value = '';
         }
 
@@ -512,7 +510,6 @@
                     errorEl.classList.add('show');
                 }
             } else {
-                // Customer login
                 const email = document.getElementById('customerEmail').value.trim();
                 const phone = document.getElementById('customerPhone').value.trim();
                 const password = document.getElementById('customerPassword').value.trim();
@@ -523,7 +520,6 @@
                     return;
                 }
 
-                // First, check if customer exists in registered customers
                 const customers = getCustomers();
                 let customer = null;
                 if (email) {
@@ -533,7 +529,6 @@
                 }
 
                 if (customer) {
-                    // Registered customer – require password
                     if (!password) {
                         errorEl.textContent = '❌ Please enter your password.';
                         errorEl.classList.add('show');
@@ -554,16 +549,15 @@
                     return;
                 }
 
-                // If not registered, fallback to booking search (existing behavior)
+                // Fallback to booking search
                 const bookings = getBookings();
-                const bookingCustomer = bookings.find(b => 
+                const bookingCustomer = bookings.find(b =>
                     (email && b.email && b.email.toLowerCase() === email.toLowerCase()) ||
                     (phone && b.phone && b.phone.replace(/\s/g, '') === phone.replace(/\s/g, ''))
                 );
                 if (bookingCustomer) {
                     successEl.textContent = `✅ Welcome back, ${bookingCustomer.customer}! Redirecting...`;
                     successEl.classList.add('show');
-                    // Store booking customer info (without password)
                     const tempCustomer = {
                         name: bookingCustomer.customer,
                         email: bookingCustomer.email,
@@ -576,7 +570,7 @@
                         window.location.href = 'dashboard.html';
                     }, 800);
                 } else {
-                    errorEl.textContent = '❌ No account found with that email or phone. Please register or book first.';
+                    errorEl.textContent = '❌ No account found. Please register or book first.';
                     errorEl.classList.add('show');
                 }
             }
@@ -625,12 +619,10 @@
             if (e) e.preventDefault();
             document.getElementById('registerModal').classList.add('active');
             document.body.style.overflow = 'hidden';
-            // Clear previous messages
             document.getElementById('regError').classList.remove('show');
             document.getElementById('regSuccess').classList.remove('show');
             document.getElementById('regError').textContent = '';
             document.getElementById('regSuccess').textContent = '';
-            // Clear form
             document.getElementById('regName').value = '';
             document.getElementById('regEmail').value = '';
             document.getElementById('regPhone').value = '';
@@ -643,7 +635,6 @@
             document.body.style.overflow = '';
         }
 
-        // Click outside modal to close
         document.getElementById('registerModal').addEventListener('click', function(e) {
             if (e.target === this) closeRegisterModal();
         });
@@ -679,7 +670,6 @@
                 return;
             }
 
-            // Check if email or phone already registered
             const customers = getCustomers();
             if (customers.some(c => c.email.toLowerCase() === email.toLowerCase())) {
                 errorEl.textContent = '❌ This email is already registered.';
@@ -692,7 +682,6 @@
                 return;
             }
 
-            // Save new customer
             const newCustomer = {
                 id: Date.now(),
                 name: name,
@@ -707,21 +696,17 @@
             successEl.textContent = '✅ Registration successful! You can now log in.';
             successEl.classList.add('show');
 
-            // Clear form
             document.getElementById('regName').value = '';
             document.getElementById('regEmail').value = '';
             document.getElementById('regPhone').value = '';
             document.getElementById('regPassword').value = '';
             document.getElementById('regConfirmPassword').value = '';
 
-            // Auto-close after 2 seconds and switch to customer login
             setTimeout(() => {
                 closeRegisterModal();
                 switchRole('customer');
-                // Pre-fill email/phone
                 document.getElementById('customerEmail').value = email;
                 document.getElementById('customerPhone').value = phone;
-                // Focus password
                 document.getElementById('customerPassword').focus();
             }, 2000);
         }
