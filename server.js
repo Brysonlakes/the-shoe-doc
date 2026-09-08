@@ -1,326 +1,202 @@
 const express = require('express');
-const nodemailer = require('nodemailer');
 const cors = require('cors');
+const fetch = require('node-fetch');
+const app = express();
 
-
+// Force TLS for Render
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-const app = express();
 app.use(cors());
 app.use(express.json());
 
-
 // =====================================================
-// 🔥 MAILGUN SMTP CONFIGURATION
+// 🔥 MAILGUN API CONFIGURATION
 // =====================================================
-const SMTP_HOST = 'smtp.mailgun.org';        // or smtp.eu.mailgun.org for EU
-const SMTP_PORT = 587;                       // Recommended port
-const SMTP_SECURE = false;                   // false for port 587
-const SMTP_USER = 'brysonlakes@sandbox01b6c05024e041f4b9563ac663455533.mailgun.org'; // YOUR Mailgun SMTP username
-const SMTP_PASSWORD = 'Prototype@123'; // YOUR Mailgun password
-const SENDER_EMAIL = 'brysonlakes@sandbox01b6c05024e041f4b9563ac663455533.mailgun.org'; // Same as username
+const MAILGUN_API_KEY = 'de6cd3db2d8e81485437a1f834c82170-55613b82-021fda8f';  // ← Paste your API key here
+const MAILGUN_DOMAIN = 'sandbox01b6c05024e041f4b9563ac663455533.mailgun.org';
+const SENDER_EMAIL = `brysonlakes@${MAILGUN_DOMAIN}`;
 const SENDER_NAME = 'THE SHOE DOC';
 // =====================================================
-// =====================================================
 
-const transporter = nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: SMTP_PORT,
-    secure: SMTP_SECURE,
-    auth: {
-        user: SMTP_USER,
-        pass: SMTP_PASSWORD
-    }
-});
-
-// =====================================================
-// ALL EMAIL TEMPLATES
-// =====================================================
-const TEMPLATES = {
-    signup_confirmation: {
-        subject: '✅ Welcome to THE SHOE DOC!',
-        html: (data) => `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f4f4f4;border-radius:16px;">
-                <div style="background:#0A0A0A;padding:20px;border-radius:16px 16px 0 0;text-align:center;border-bottom:4px solid #D4AF37;">
-                    <h1 style="color:#D4AF37;font-family:Georgia,serif;font-size:1.8rem;">THE SHOE DOC</h1>
-                </div>
-                <div style="background:white;padding:30px 28px;border-radius:0 0 16px 16px;color:#222;">
-                    <h2>Hi ${data.name}, 👋</h2>
-                    <p>Welcome to THE SHOE DOC! Your account has been created successfully.</p>
-                    <p style="margin-top:20px;">You can now log in and start booking our premium shoe cleaning services.</p>
-                    <p style="margin-top:20px;">📍 <strong>Visit us at:</strong> 40 st georges road, East London, 5201</p>
-                    <p>📞 Contact us: 082-590-2968</p>
-                    <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;text-align:center;color:#aaa;font-size:0.8rem;">&copy; 2026 THE SHOE DOC · East London, South Africa</div>
-                </div>
-            </div>
-        `
-    },
-
-reward_update: {
-    subject: '🎉 Points Reward Update – THE SHOE DOC',
-    html: (data) => `
-        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f4f4f4;border-radius:16px;">
-            <div style="background:#0A0A0A;padding:20px;border-radius:16px 16px 0 0;text-align:center;border-bottom:4px solid #D4AF37;">
-                <h1 style="color:#D4AF37;font-family:Georgia,serif;font-size:1.8rem;">THE SHOE DOC</h1>
-            </div>
-            <div style="background:white;padding:30px 28px;border-radius:0 0 16px 16px;color:#222;">
-                <h2>Points Update, ${data.name}! 🎉</h2>
-                <p>You've earned points on your recent booking.</p>
-                <table style="width:100%;border-collapse:collapse;margin:20px 0;">
-                    <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>Points Earned</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">+${data.points_earned}</td></tr>
-                    <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>Total Points</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">${data.total_points}</td></tr>
-                    <tr><td style="padding:8px;"><strong>Points Value</strong></td><td style="padding:8px;">R${(data.total_points / 10 * 5).toFixed(2)} discount</td></tr>
-                </table>
-                <p style="margin-top:20px;">💡 <strong>10 points = R5 discount</strong> on your next booking!</p>
-                <p>📍 <strong>Visit us at:</strong> 123 Oxford Street, East London, 5201</p>
-                <p>📞 Contact us: 082-590-2968</p>
-                <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;text-align:center;color:#aaa;font-size:0.8rem;">&copy; 2026 THE SHOE DOC · East London, South Africa</div>
-            </div>
-        </div>
-    `
-},
-
-    affiliate_confirmation: {
-        subject: '🎉 Welcome to THE SHOE DOC Affiliate Program!',
-        html: (data) => `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f4f4f4;border-radius:16px;">
-                <div style="background:#0A0A0A;padding:20px;border-radius:16px 16px 0 0;text-align:center;border-bottom:4px solid #D4AF37;">
-                    <h1 style="color:#D4AF37;font-family:Georgia,serif;font-size:1.8rem;">THE SHOE DOC</h1>
-                </div>
-                <div style="background:white;padding:30px 28px;border-radius:0 0 16px 16px;color:#222;">
-                    <h2>Welcome to the Affiliate Program, ${data.name}! 🎉</h2>
-                    <p>Your affiliate account has been approved! Start earning R20 per pair you refer.</p>
-                    <div style="background:#f9f9f9;padding:16px;border-radius:10px;margin:20px 0;border-left:4px solid #D4AF37;">
-                        <p style="margin:0;"><strong>Your Unique Affiliate Code:</strong></p>
-                        <p style="margin:4px 0;font-size:1.5rem;font-weight:bold;color:#B8860B;letter-spacing:2px;">${data.affiliate_code}</p>
-                    </div>
-                    <p>Share this code with customers. When they book using your code, you earn!</p>
-                    <p><strong>Commission:</strong> R20 per pair referred</p>
-                    <p><strong>Minimum Payout:</strong> R200</p>
-                    <p style="margin-top:20px;">📍 <strong>Visit your dashboard:</strong> <a href="https://brysonlakes.github.io/the-shoe-doc/affiliate-dashboard.html" style="color:#D4AF37;">Affiliate Dashboard</a></p>
-                    <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;text-align:center;color:#aaa;font-size:0.8rem;">&copy; 2026 THE SHOE DOC · East London, South Africa</div>
-                </div>
-            </div>
-        `
-    },
-
-
-affiliate_earnings: {
-    subject: '💰 New Affiliate Earnings Report',
-    html: (data) => `
-        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f4f4f4;border-radius:16px;">
-            <div style="background:#0A0A0A;padding:20px;border-radius:16px 16px 0 0;text-align:center;border-bottom:4px solid #D4AF37;">
-                <h1 style="color:#D4AF37;font-family:Georgia,serif;font-size:1.8rem;">THE SHOE DOC</h1>
-            </div>
-            <div style="background:white;padding:30px 28px;border-radius:0 0 16px 16px;color:#222;">
-                <h2>New Earnings Update, ${data.name}! 💰</h2>
-                <p>You've earned commission from a new booking!</p>
-                <table style="width:100%;border-collapse:collapse;margin:20px 0;">
-                    <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>Commission Type</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">${data.type || 'Direct Referral'}</td></tr>
-                    <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>Amount Earned</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">R${data.amount}</td></tr>
-                    <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>Total Balance</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">R${data.balance}</td></tr>
-                    <tr><td style="padding:8px;"><strong>Referred Customer</strong></td><td style="padding:8px;">${data.customer}</td></tr>
-                </table>
-                <p style="margin-top:20px;">Keep sharing your affiliate code to earn more!</p>
-                <p><strong>Your Affiliate Code:</strong> <span style="color:#B8860B;font-weight:bold;font-size:1.1rem;">${data.affiliate_code}</span></p>
-                <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;text-align:center;color:#aaa;font-size:0.8rem;">&copy; 2026 THE SHOE DOC · East London, South Africa</div>
-            </div>
-        </div>
-    `
-},
-
-
-affiliate_payment: {
-        subject: '💰 Affiliate Payment Confirmation',
-        html: (data) => `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f4f4f4;border-radius:16px;">
-                <div style="background:#0A0A0A;padding:20px;border-radius:16px 16px 0 0;text-align:center;border-bottom:4px solid #D4AF37;">
-                    <h1 style="color:#D4AF37;font-family:Georgia,serif;font-size:1.8rem;">THE SHOE DOC</h1>
-                </div>
-                <div style="background:white;padding:30px 28px;border-radius:0 0 16px 16px;color:#222;">
-                    <h2>Payment Confirmation, ${data.name}! 💰</h2>
-                    <p>Your affiliate commission payment has been processed.</p>
-                    <table style="width:100%;border-collapse:collapse;margin:20px 0;">
-                        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>Amount Paid</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">R${data.amount}</td></tr>
-                        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>Remaining Balance</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">R${data.balance}</td></tr>
-                        <tr><td style="padding:8px;"><strong>Reference</strong></td><td style="padding:8px;">${data.note || 'Affiliate commission payment'}</td></tr>
-                    </table>
-                    <p style="margin-top:20px;">The payment has been sent to your bank account.</p>
-                    <p><strong>Your Affiliate Code:</strong> <span style="color:#B8860B;font-weight:bold;font-size:1.1rem;">${data.affiliate_code}</span></p>
-                    <p style="margin-top:20px;">Keep sharing your code to earn more!</p>
-                    <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;text-align:center;color:#aaa;font-size:0.8rem;">&copy; 2026 THE SHOE DOC · East London, South Africa</div>
-                </div>
-            </div>
-        `
-    },
-    payment_confirmed: {
-        subject: '✅ Payment Confirmed – THE SHOE DOC',
-        html: (data) => `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f4f4f4;border-radius:16px;">
-                <div style="background:#0A0A0A;padding:20px;border-radius:16px 16px 0 0;text-align:center;border-bottom:4px solid #D4AF37;">
-                    <h1 style="color:#D4AF37;font-family:Georgia,serif;font-size:1.8rem;">THE SHOE DOC</h1>
-                </div>
-                <div style="background:white;padding:30px 28px;border-radius:0 0 16px 16px;color:#222;">
-                    <h2>Payment Confirmed! 💳</h2>
-                    <p>Dear ${data.customer},</p>
-                    <p>Your payment of <strong>R${data.amount}</strong> for the <strong>${data.service}</strong> service has been confirmed.</p>
-                    <table style="width:100%;border-collapse:collapse;margin:20px 0;">
-                        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>Service</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">${data.service}</td></tr>
-                        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>Date</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">${data.date}</td></tr>
-                        <tr><td style="padding:8px;"><strong>Time</strong></td><td style="padding:8px;">${data.time}</td></tr>
-                    </table>
-                    <p style="margin-top:20px;">📍 <strong>Visit us at:</strong> 40 st georges road, East London, 5201</p>
-                    <p>📞 Contact us: 082-590-2968</p>
-                    <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;text-align:center;color:#aaa;font-size:0.8rem;">&copy; 2026 THE SHOE DOC · East London, South Africa</div>
-                </div>
-            </div>
-        `
-    },
-    booking_confirmed: {
-        subject: '📋 Booking Confirmed – THE SHOE DOC',
-        html: (data) => `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f4f4f4;border-radius:16px;">
-                <div style="background:#0A0A0A;padding:20px;border-radius:16px 16px 0 0;text-align:center;border-bottom:4px solid #D4AF37;">
-                    <h1 style="color:#D4AF37;font-family:Georgia,serif;font-size:1.8rem;">THE SHOE DOC</h1>
-                </div>
-                <div style="background:white;padding:30px 28px;border-radius:0 0 16px 16px;color:#222;">
-                    <h2>Booking Confirmed! 📋</h2>
-                    <p>Dear ${data.customer},</p>
-                    <p>Your booking for <strong>${data.service}</strong> has been confirmed.</p>
-                    <table style="width:100%;border-collapse:collapse;margin:20px 0;">
-                        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>Service</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">${data.service}</td></tr>
-                        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>Date</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">${data.date}</td></tr>
-                        <tr><td style="padding:8px;"><strong>Time</strong></td><td style="padding:8px;">${data.time}</td></tr>
-                    </table>
-                    <p style="margin-top:20px;">📍 <strong>Visit us at:</strong> 40 st georges road, East London, 5201</p>
-                    <p>📞 Contact us: 082-590-2968</p>
-                    <p style="margin-top:20px;">We look forward to serving you!</p>
-                    <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;text-align:center;color:#aaa;font-size:0.8rem;">&copy; 2026 THE SHOE DOC · East London, South Africa</div>
-                </div>
-            </div>
-        `
-    },
-    booking_completed: {
-        subject: '✔️ Service Completed – THE SHOE DOC',
-        html: (data) => `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f4f4f4;border-radius:16px;">
-                <div style="background:#0A0A0A;padding:20px;border-radius:16px 16px 0 0;text-align:center;border-bottom:4px solid #D4AF37;">
-                    <h1 style="color:#D4AF37;font-family:Georgia,serif;font-size:1.8rem;">THE SHOE DOC</h1>
-                </div>
-                <div style="background:white;padding:30px 28px;border-radius:0 0 16px 16px;color:#222;">
-                    <h2>Service Completed! ✔️</h2>
-                    <p>Dear ${data.customer},</p>
-                    <p>Your <strong>${data.service}</strong> service has been completed successfully.</p>
-                    <p style="margin-top:20px;">Your shoes are ready for collection at our shop.</p>
-                    <p>📍 <strong>Visit us at:</strong> 40 st georges road, East London, 5201</p>
-                    <p>📞 Contact us: 082-590-2968</p>
-                    <p style="margin-top:20px;">🔄 <strong>Ready for another clean?</strong> Book your next service today!</p>
-                    <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;text-align:center;color:#aaa;font-size:0.8rem;">&copy; 2026 THE SHOE DOC · East London, South Africa</div>
-                </div>
-            </div>
-        `
-    },
-    new_booking: {
-        subject: '📦 New Booking Confirmed!',
-        html: (data) => `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f4f4f4;border-radius:16px;">
-                <div style="background:#0A0A0A;padding:20px;border-radius:16px 16px 0 0;text-align:center;border-bottom:4px solid #D4AF37;">
-                    <h1 style="color:#D4AF37;font-family:Georgia,serif;font-size:1.8rem;">THE SHOE DOC</h1>
-                </div>
-                <div style="background:white;padding:30px 28px;border-radius:0 0 16px 16px;color:#222;">
-                    <h2>New Booking Confirmed! 📦</h2>
-                    <p>Dear ${data.customer}, your booking has been confirmed.</p>
-                    <table style="width:100%;border-collapse:collapse;margin:20px 0;">
-                        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>Service</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">${data.service}</td></tr>
-                        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>Date</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">${data.date}</td></tr>
-                        <tr><td style="padding:8px;border-bottom:1px solid #eee;"><strong>Time</strong></td><td style="padding:8px;border-bottom:1px solid #eee;">${data.time}</td></tr>
-                        <tr><td style="padding:8px;"><strong>Total</strong></td><td style="padding:8px;">R${data.total}</td></tr>
-                    </table>
-                    <p style="margin-top:20px;">📍 <strong>Visit us at:</strong> 40 st georges road, East London, 5201</p>
-                    <p>📞 Contact us: 082-590-2968</p>
-                    <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;text-align:center;color:#aaa;font-size:0.8rem;">&copy; 2026 THE SHOE DOC · East London, South Africa</div>
-                </div>
-            </div>
-        `
-    },
-    booking_ready: {
-        subject: '👟 Your Shoes Are Ready for Delivery!',
-        html: (data) => `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f4f4f4;border-radius:16px;">
-                <div style="background:#0A0A0A;padding:20px;border-radius:16px 16px 0 0;text-align:center;border-bottom:4px solid #D4AF37;">
-                    <h1 style="color:#D4AF37;font-family:Georgia,serif;font-size:1.8rem;">THE SHOE DOC</h1>
-                </div>
-                <div style="background:white;padding:30px 28px;border-radius:0 0 16px 16px;color:#222;">
-                    <h2>Your Shoes Are Ready! 👟</h2>
-                    <p>Dear ${data.customer}, your shoes have been cleaned and are ready for delivery.</p>
-                    <p style="margin-top:20px;">📍 <strong>Pickup Address:</strong> 40 st georges road, East London, 5201</p>
-                    <p>📞 Contact us: 082-590-2968</p>
-                    <p style="margin-top:20px;">Please bring your invoice when collecting.</p>
-                    <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;text-align:center;color:#aaa;font-size:0.8rem;">&copy; 2026 THE SHOE DOC · East London, South Africa</div>
-                </div>
-            </div>
-        `
-    },
-    shoe_delivered: {
-        subject: '✅ Your Shoes Have Been Delivered!',
-        html: (data) => `
-            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f4f4f4;border-radius:16px;">
-                <div style="background:#0A0A0A;padding:20px;border-radius:16px 16px 0 0;text-align:center;border-bottom:4px solid #D4AF37;">
-                    <h1 style="color:#D4AF37;font-family:Georgia,serif;font-size:1.8rem;">THE SHOE DOC</h1>
-                </div>
-                <div style="background:white;padding:30px 28px;border-radius:0 0 16px 16px;color:#222;">
-                    <h2>Shoes Delivered Successfully! ✅</h2>
-                    <p>Dear ${data.customer}, your shoes have been delivered.</p>
-                    <p style="margin-top:20px;">We hope you love them! If you're happy with the service, please consider leaving a review.</p>
-                    <p style="margin-top:20px;">🔄 <strong>Ready for another clean?</strong> Book your next service today!</p>
-                    <p>📍 <strong>Visit us at:</strong> 40 st georges road, East London, 5201</p>
-                    <p>📞 Contact us: 082-590-2968</p>
-                    <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;text-align:center;color:#aaa;font-size:0.8rem;">&copy; 2026 THE SHOE DOC · East London, South Africa</div>
-                </div>
-            </div>
-        `
-    }
-};
-
-// =====================================================
-// EMAIL SENDING ENDPOINT
-// =====================================================
-app.post('/send-email', async (req, res) => {
-    const { to, template, data } = req.body;
-    if (!to || !template || !data) {
-        return res.status(400).json({ success: false, error: 'Missing required fields' });
-    }
-    const templateData = TEMPLATES[template];
-    if (!templateData) {
-        return res.status(400).json({ success: false, error: 'Invalid template' });
-    }
-    try {
-        const info = await transporter.sendMail({
-            from: `"${SENDER_NAME}" <${SENDER_EMAIL}>`,
-            to: to,
-            subject: templateData.subject,
-            html: templateData.html(data)
-        });
-        console.log(`✅ Email sent to ${to} (${template})`);
-        res.json({ success: true, messageId: info.messageId });
-    } catch (error) {
-        console.error('❌ Error sending email:', error);
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// =====================================================
-// HEALTH CHECK
-// =====================================================
+// Health check endpoint
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', service: 'THE SHOE DOC Email Server' });
 });
 
-// =====================================================
-// START SERVER
-// =====================================================
-const PORT = 3000;
+// Email sending endpoint
+app.post('/send-email', async (req, res) => {
+    const { to, template, data } = req.body;
+    
+    if (!to || !template) {
+        return res.status(400).json({ error: 'Missing required fields: to, template' });
+    }
+
+    // ============================================================
+    // EMAIL TEMPLATES
+    // ============================================================
+    const templates = {
+        signup_confirmation: {
+            subject: '✅ Booking Confirmed - THE SHOE DOC',
+            html: `
+                <h2>Hello ${data.name || 'Customer'},</h2>
+                <p>Your booking has been <strong>confirmed</strong>!</p>
+                <p><strong>Service:</strong> ${data.service || 'Shoe Cleaning'}</p>
+                <p><strong>Date:</strong> ${data.date || 'N/A'}</p>
+                <p><strong>Time:</strong> ${data.time || 'N/A'}</p>
+                <p><strong>Total:</strong> R${data.total || '0'}</p>
+                <br>
+                <p>Thank you for choosing THE SHOE DOC!</p>
+                <p>📍 123 Oxford Street, East London</p>
+                <p>📞 082-590-2968</p>
+            `
+        },
+        new_booking: {
+            subject: '📦 New Booking Received - THE SHOE DOC',
+            html: `
+                <h2>New Booking Alert!</h2>
+                <p><strong>Customer:</strong> ${data.customer || 'N/A'}</p>
+                <p><strong>Service:</strong> ${data.service || 'N/A'}</p>
+                <p><strong>Date:</strong> ${data.date || 'N/A'}</p>
+                <p><strong>Time:</strong> ${data.time || 'N/A'}</p>
+                <p><strong>Total:</strong> R${data.total || '0'}</p>
+                <br>
+                <p>Log in to the admin panel to manage this booking.</p>
+            `
+        },
+        payment_confirmed: {
+            subject: '💰 Payment Confirmed - THE SHOE DOC',
+            html: `
+                <h2>Hello ${data.customer || 'Customer'},</h2>
+                <p>Your payment of <strong>R${data.amount || '0'}</strong> has been confirmed!</p>
+                <p>Your booking for <strong>${data.service || 'Shoe Cleaning'}</strong> on <strong>${data.date || 'N/A'}</strong> is now confirmed.</p>
+                <br>
+                <p>Thank you for choosing THE SHOE DOC!</p>
+            `
+        },
+        booking_confirmed: {
+            subject: '✅ Booking Confirmed - THE SHOE DOC',
+            html: `
+                <h2>Hello ${data.customer || 'Customer'},</h2>
+                <p>Your booking has been <strong>confirmed</strong>!</p>
+                <p><strong>Service:</strong> ${data.service || 'Shoe Cleaning'}</p>
+                <p><strong>Date:</strong> ${data.date || 'N/A'}</p>
+                <p><strong>Time:</strong> ${data.time || 'N/A'}</p>
+                <br>
+                <p>Thank you for choosing THE SHOE DOC!</p>
+            `
+        },
+        booking_completed: {
+            subject: '✔️ Service Completed - THE SHOE DOC',
+            html: `
+                <h2>Hello ${data.customer || 'Customer'},</h2>
+                <p>Your <strong>${data.service || 'Shoe Cleaning'}</strong> service has been <strong>completed</strong>!</p>
+                <p>Your shoes are ready for pickup.</p>
+                <br>
+                <p>Thank you for choosing THE SHOE DOC!</p>
+                <p>📍 123 Oxford Street, East London</p>
+            `
+        },
+        booking_ready: {
+            subject: '📦 Ready for Pickup - THE SHOE DOC',
+            html: `
+                <h2>Hello ${data.customer || 'Customer'},</h2>
+                <p>Your shoes are <strong>ready for pickup</strong>!</p>
+                <p>Come visit us at:</p>
+                <p>📍 123 Oxford Street, East London</p>
+                <p>📞 082-590-2968</p>
+                <br>
+                <p>Thank you for choosing THE SHOE DOC!</p>
+            `
+        },
+        shoe_delivered: {
+            subject: '📦 Shoes Delivered - THE SHOE DOC',
+            html: `
+                <h2>Hello ${data.customer || 'Customer'},</h2>
+                <p>Your shoes have been <strong>delivered</strong>!</p>
+                <p>Thank you for choosing THE SHOE DOC!</p>
+                <br>
+                <p>We hope to see you again soon!</p>
+            `
+        },
+        affiliate_earnings: {
+            subject: '💰 Affiliate Earnings - THE SHOE DOC',
+            html: `
+                <h2>Hello ${data.name || 'Affiliate'},</h2>
+                <p>You've earned <strong>R${data.amount || '0'}</strong> from a referral!</p>
+                <p><strong>Customer:</strong> ${data.customer || 'N/A'}</p>
+                <p><strong>Type:</strong> ${data.type || 'Direct Referral'}</p>
+                <p><strong>Current Balance:</strong> R${data.balance || '0'}</p>
+                <br>
+                <p>Keep sharing your affiliate code: <strong>${data.affiliate_code || 'N/A'}</strong></p>
+                <p>Thank you for being part of THE SHOE DOC affiliate program!</p>
+            `
+        },
+        affiliate_payment: {
+            subject: '💰 Affiliate Payment - THE SHOE DOC',
+            html: `
+                <h2>Hello ${data.name || 'Affiliate'},</h2>
+                <p>You've been paid <strong>R${data.amount || '0'}</strong>!</p>
+                <p><strong>Note:</strong> ${data.note || 'Affiliate commission'}</p>
+                <p><strong>New Balance:</strong> R${data.balance || '0'}</p>
+                <br>
+                <p>Thank you for being part of THE SHOE DOC affiliate program!</p>
+            `
+        },
+        reward_update: {
+            subject: '🏆 Reward Points Update - THE SHOE DOC',
+            html: `
+                <h2>Hello ${data.name || 'Customer'},</h2>
+                <p>You've earned <strong>${data.points_earned || 0} reward points</strong>!</p>
+                <p><strong>Total Points:</strong> ${data.total_points || 0}</p>
+                <p>10 points = R5 discount on your next booking!</p>
+                <br>
+                <p>Thank you for choosing THE SHOE DOC!</p>
+            `
+        }
+    };
+
+    const templateData = templates[template];
+    if (!templateData) {
+        return res.status(400).json({ error: 'Invalid template' });
+    }
+
+    try {
+        // ============================================================
+        // SEND EMAIL VIA MAILGUN API
+        // ============================================================
+        const formData = new URLSearchParams();
+        formData.append('from', `${SENDER_NAME} <${SENDER_EMAIL}>`);
+        formData.append('to', to);
+        formData.append('subject', templateData.subject);
+        formData.append('html', templateData.html);
+
+        const response = await fetch(`https://api.mailgun.net/v3/${MAILGUN_DOMAIN}/messages`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${Buffer.from(`api:${MAILGUN_API_KEY}`).toString('base64')}`,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            console.log(`✅ Email sent to ${to} (${template})`);
+            res.json({ success: true, message: result });
+        } else {
+            console.error('❌ Mailgun error:', result);
+            res.status(response.status).json({ error: result });
+        }
+    } catch (error) {
+        console.error('❌ Error sending email:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Start server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 Email server running on http://localhost:${PORT}`);
-    console.log(`📧 Sending emails via ${SMTP_HOST}`);
+    console.log(`📧 Sending emails via Mailgun API (${MAILGUN_DOMAIN})`);
 });
