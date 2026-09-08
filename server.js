@@ -10,8 +10,8 @@ app.use(express.json());
 // 🔥 REPLACE WITH YOUR SMTP CREDENTIALS
 // =====================================================
 const SMTP_HOST = 'smtp.gmail.com';
-const SMTP_PORT = 587;
-const SMTP_SECURE = false;
+const SMTP_PORT = 465;
+const SMTP_SECURE = true;
 const SMTP_USER = 'theshoedoc3@gmail.com';
 const SMTP_PASSWORD = 'uuvcjafqebflddbg';
 const SENDER_EMAIL = 'theshoedoc3@gmail.com';
