@@ -792,7 +792,7 @@
         // EMAIL FUNCTIONS
         // ============================================================
         function sendAdminNotification(booking) {
-            const serverUrl = 'http://localhost:3000';
+            const serverUrl = 'https://shoe-doc-email-server.onrender.com';
             fetch(serverUrl + '/send-email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -811,7 +811,7 @@
         }
 
         function sendCustomerConfirmation(booking) {
-            const serverUrl = 'http://localhost:3000';
+            const serverUrl = 'https://shoe-doc-email-server.onrender.com';
             fetch(serverUrl + '/send-email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
