@@ -10,6 +10,7 @@ app.use(express.json());
 // 🔥 RESEND API CONFIGURATION
 // =====================================================
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
+console.log('🔑 API Key loaded:', RESEND_API_KEY ? '✅ Yes' : '❌ No');
 const SENDER_EMAIL = 'onboarding@resend.dev';  // Resend's test domain
 const SENDER_NAME = 'THE SHOE DOC';
 // =====================================================
