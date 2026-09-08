@@ -12,7 +12,7 @@ app.use(express.json());
 // =====================================================
 // 🔥 MAILGUN API CONFIGURATION
 // =====================================================
-const MAILGUN_API_KEY = 'de6cd3db2d8e81485437a1f834c82170-55613b82-021fda8f';  // ← Paste your API key here
+const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY;  // ← Paste your API key here
 const MAILGUN_DOMAIN = 'sandbox01b6c05024e041f4b9563ac663455533.mailgun.org';
 const SENDER_EMAIL = `brysonlakes@${MAILGUN_DOMAIN}`;
 const SENDER_NAME = 'THE SHOE DOC';
