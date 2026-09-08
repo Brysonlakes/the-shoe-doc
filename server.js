@@ -9,16 +9,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
 // =====================================================
-// 🔥 REPLACE WITH YOUR SMTP CREDENTIALS
+// 🔥 MAILGUN SMTP CONFIGURATION
 // =====================================================
-const SMTP_HOST = 'smtp.gmail.com';
-const SMTP_PORT = 465;
-const SMTP_SECURE = true;
-const SMTP_USER = 'theshoedoc3@gmail.com';
-const SMTP_PASSWORD = 'uuvcjafqebflddbg';
-const SENDER_EMAIL = 'theshoedoc3@gmail.com';
+const SMTP_HOST = 'smtp.mailgun.org';        // or smtp.eu.mailgun.org for EU
+const SMTP_PORT = 587;                       // Recommended port
+const SMTP_SECURE = false;                   // false for port 587
+const SMTP_USER = 'brysonlakes@sandbox01b6c05024e041f4b9563ac663455533.mailgun.org'; // YOUR Mailgun SMTP username
+const SMTP_PASSWORD = 'Prototype@123'; // YOUR Mailgun password
+const SENDER_EMAIL = 'brysonlakes@sandbox01b6c05024e041f4b9563ac663455533.mailgun.org'; // Same as username
 const SENDER_NAME = 'THE SHOE DOC';
+// =====================================================
 // =====================================================
 
 const transporter = nodemailer.createTransport({
