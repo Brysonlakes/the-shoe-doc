@@ -496,7 +496,7 @@
         }
 
         function sendRewardUpdateEmail(booking) {
-            const serverUrl = ''https://shoe-doc-email-server.onrender.com';
+            const serverUrl = 'https://shoe-doc-email-server.onrender.com';
             const rewards = getCustomerRewards(booking.email);
             fetch(serverUrl + '/send-email', {
                 method: 'POST',
@@ -566,7 +566,7 @@
         // AFFILIATE EARNINGS EMAIL
         // ============================================================
         function sendAffiliateEarningsEmail(affiliate, customer, amount, type) {
-            const serverUrl = 'http://https://shoe-doc-email-server.onrender.com';
+            const serverUrl = 'https://shoe-doc-email-server.onrender.com';
             const typeLabel = type === 'direct' ? 'Direct Referral' : 'Downline Commission';
             fetch(serverUrl + '/send-email', {
                 method: 'POST',
@@ -792,7 +792,7 @@
         // EMAIL FUNCTIONS
         // ============================================================
         function sendAdminNotification(booking) {
-            const serverUrl = 'http://https://shoe-doc-email-server.onrender.com';
+            const serverUrl = 'https://shoe-doc-email-server.onrender.com';
             fetch(serverUrl + '/send-email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -811,7 +811,7 @@
         }
 
         function sendCustomerConfirmation(booking) {
-            const serverUrl = 'http://https://shoe-doc-email-server.onrender.com';
+            const serverUrl = 'https://shoe-doc-email-server.onrender.com';
             fetch(serverUrl + '/send-email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
