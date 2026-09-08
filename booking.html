@@ -496,7 +496,7 @@
         }
 
         function sendRewardUpdateEmail(booking) {
-            const serverUrl = 'http://localhost:3000';
+            const serverUrl = 'https://shoe-doc-email-server.onrender.com';
             const rewards = getCustomerRewards(booking.email);
             fetch(serverUrl + '/send-email', {
                 method: 'POST',
