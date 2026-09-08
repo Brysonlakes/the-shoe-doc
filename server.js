@@ -1,20 +1,16 @@
+
 const express = require('express');
 const cors = require('cors');
-
 const app = express();
-
-// Force TLS for Render
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 app.use(cors());
 app.use(express.json());
 
 // =====================================================
-// 🔥 MAILGUN API CONFIGURATION
+// 🔥 RESEND API CONFIGURATION
 // =====================================================
-const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY;  // ← Paste your API key here
-const MAILGUN_DOMAIN = 'sandbox01b6c05024e041f4b9563ac663455533.mailgun.org';
-const SENDER_EMAIL = `brysonlakes@${MAILGUN_DOMAIN}`;
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const SENDER_EMAIL = 'onboarding@resend.dev';  // Resend's test domain
 const SENDER_NAME = 'THE SHOE DOC';
 // =====================================================
 
@@ -162,21 +158,20 @@ app.post('/send-email', async (req, res) => {
 
     try {
         // ============================================================
-        // SEND EMAIL VIA MAILGUN API
+        // SEND EMAIL VIA RESEND API
         // ============================================================
-        const formData = new URLSearchParams();
-        formData.append('from', `${SENDER_NAME} <${SENDER_EMAIL}>`);
-        formData.append('to', to);
-        formData.append('subject', templateData.subject);
-        formData.append('html', templateData.html);
-
-        const response = await fetch(`https://api.mailgun.net/v3/${MAILGUN_DOMAIN}/messages`, {
+        const response = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
-                'Authorization': `Basic ${Buffer.from(`api:${MAILGUN_API_KEY}`).toString('base64')}`,
-                'Content-Type': 'application/x-www-form-urlencoded'
+                'Authorization': `Bearer ${RESEND_API_KEY}`,
+                'Content-Type': 'application/json'
             },
-            body: formData
+            body: JSON.stringify({
+                from: `${SENDER_NAME} <${SENDER_EMAIL}>`,
+                to: [to],
+                subject: templateData.subject,
+                html: templateData.html
+            })
         });
 
         const result = await response.json();
@@ -185,7 +180,7 @@ app.post('/send-email', async (req, res) => {
             console.log(`✅ Email sent to ${to} (${template})`);
             res.json({ success: true, message: result });
         } else {
-            console.error('❌ Mailgun error:', result);
+            console.error('❌ Resend error:', result);
             res.status(response.status).json({ error: result });
         }
     } catch (error) {
@@ -195,8 +190,8 @@ app.post('/send-email', async (req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Email server running on http://localhost:${PORT}`);
-    console.log(`📧 Sending emails via Mailgun API (${MAILGUN_DOMAIN})`);
+    console.log(`📧 Sending emails via Resend API`);
 });
