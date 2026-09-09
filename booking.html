@@ -1,908 +1,1913 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>THE SHOE DOC · Book Now</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
     <style>
+
         * { margin:0; padding:0; box-sizing:border-box; }
+
         :root {
+
             --gold: #D4AF37;
+
             --gold-light: #F9D976;
+
             --gold-gradient: linear-gradient(135deg, #F9D976 0%, #D4AF37 50%, #B8860B 100%);
+
             --gold-glow: 0 0 30px rgba(212,175,55,0.3);
+
             --dark-bg: #0A0A0A;
+
             --dark-card: #141414;
+
             --dark-surface: #1A1A1A;
+
             --white: #FFFFFF;
+
             --off-white: #E0E0E0;
+
             --font-serif: 'Playfair Display', serif;
+
             --font-sans: 'Inter', sans-serif;
+
             --whatsapp: #25D366;
+
             --whatsapp-dark: #1DA851;
+
             --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
         }
+
         html { scroll-behavior: smooth; }
+
         body { font-family:var(--font-sans); background-color:var(--dark-bg); color:var(--off-white); line-height:1.6; -webkit-font-smoothing:antialiased; }
+
         a { text-decoration:none; color:inherit; }
+
         img { max-width:100%; display:block; }
+
         .container { max-width:1200px; margin:0 auto; padding:0 24px; }
+
         .section__header { text-align:center; margin-bottom:48px; }
+
         .section__label { display:inline-block; font-size:0.75rem; font-weight:600; letter-spacing:4px; text-transform:uppercase; color:var(--gold); background:rgba(212,175,55,0.12); padding:4px 16px; border-radius:20px; margin-bottom:12px; border:1px solid rgba(212,175,55,0.15); }
+
         .section__title { font-family:var(--font-serif); font-size:clamp(2rem,5vw,3.2rem); font-weight:700; color:var(--white); margin-bottom:8px; }
+
         .section__title span { background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
         .section__desc { font-size:1rem; color:#A0A0A0; max-width:500px; margin:0 auto; }
+
         .btn { display:inline-flex; align-items:center; justify-content:center; gap:10px; font-family:var(--font-sans); font-weight:600; font-size:1rem; padding:14px 32px; border-radius:50px; border:none; cursor:pointer; transition:var(--transition); text-align:center; letter-spacing:0.5px; }
+
         .btn--whatsapp { background:var(--whatsapp); color:#fff; box-shadow:0 8px 24px rgba(37,211,102,0.3); }
+
         .btn--whatsapp:hover { background:var(--whatsapp-dark); transform:translateY(-3px); box-shadow:0 12px 32px rgba(37,211,102,0.4); }
+
         .btn--large { padding:18px 48px; font-size:1.1rem; }
+
         .btn--outline-gold { background:transparent; color:var(--gold); border:1.5px solid var(--gold); padding:10px 24px; font-size:0.9rem; }
+
         .btn--outline-gold:hover { background:var(--gold-gradient); color:#000; border-color:transparent; transform:translateY(-2px); box-shadow:var(--gold-glow); }
+
         .btn--gold { background:var(--gold-gradient); color:#000; font-weight:700; box-shadow:var(--gold-glow); }
+
         .btn--gold:hover { transform:translateY(-3px); box-shadow:0 0 40px rgba(212,175,55,0.5); }
+
         .hero { position:relative; min-height:100vh; display:flex; align-items:center; background:var(--dark-bg); overflow:hidden; padding:40px 0; }
+
         .hero::before { content:''; position:absolute; top:-20%; right:-10%; width:600px; height:600px; background:radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%); border-radius:50%; pointer-events:none; }
+
         .hero::after { content:''; position:absolute; bottom:-30%; left:-10%; width:500px; height:500px; background:radial-gradient(circle, rgba(212,175,55,0.05) 0%, transparent 70%); border-radius:50%; pointer-events:none; }
+
         .hero__container { position:relative; z-index:2; width:100%; }
+
         .hero__top { display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; letter-spacing:1px; color:#A0A0A0; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:16px; margin-bottom:40px; }
+
         .hero__social a { margin-left:16px; font-weight:600; color:var(--gold); transition:var(--transition); }
+
         .hero__social a:hover { color:var(--white); }
+
         .hero__content { max-width:700px; }
+
         .hero__title { font-family:var(--font-serif); font-size:clamp(3rem,10vw,6rem); font-weight:900; line-height:1; margin-bottom:16px; }
+
         .hero__title--gold { background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:block; }
+
         .hero__title--white { color:var(--white); display:block; margin-top:-0.1em; }
+
         .hero__tagline { font-size:clamp(1rem,2vw,1.25rem); color:#B0B0B0; max-width:500px; margin-bottom:36px; line-height:1.8; font-weight:300; }
+
         .hero__scroll { margin-top:60px; color:#555; text-align:center; animation:bounce 2s infinite; font-size:1.5rem; letter-spacing:2px; }
+
         @keyframes bounce { 0%,100% { transform:translateY(0); } 50% { transform:translateY(10px); } }
+
         .offer { background:var(--gold-gradient); padding:20px 0; text-align:center; color:#000; position:relative; overflow:hidden; box-shadow:0 8px 32px rgba(212,175,55,0.3); }
+
         .offer__container { display:flex; flex-direction:column; align-items:center; gap:4px; }
+
         .offer__badge { font-size:0.7rem; font-weight:700; letter-spacing:3px; text-transform:uppercase; background:rgba(0,0,0,0.15); padding:2px 16px; border-radius:20px; }
+
         .offer__title { font-family:var(--font-serif); font-size:clamp(1.8rem,5vw,3rem); font-weight:900; letter-spacing:-0.5px; }
+
         .offer__title span { background:rgba(0,0,0,0.1); padding:0 16px; border-radius:8px; }
+
         .offer__sub { font-weight:500; opacity:0.9; }
+
         .services { padding:80px 0; background:var(--dark-bg); }
+
         .services__grid { display:grid; grid-template-columns:1fr; gap:24px; }
+
         .service-card { background:var(--dark-card); padding:32px 24px; border-radius:20px; text-align:center; border:1px solid rgba(255,255,255,0.04); transition:var(--transition); position:relative; overflow:hidden; }
+
         .service-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold-gradient); opacity:0; transition:var(--transition); }
+
         .service-card:hover::before { opacity:1; }
+
         .service-card:hover { transform:translateY(-8px); border-color:rgba(212,175,55,0.2); box-shadow:0 20px 40px rgba(0,0,0,0.6), var(--gold-glow); }
+
         .service-card__icon { font-size:2.8rem; margin-bottom:12px; display:block; }
+
         .service-card__title { font-family:var(--font-serif); font-size:1.4rem; color:var(--white); margin-bottom:4px; }
+
         .service-card__desc { font-size:0.9rem; color:#888; margin-bottom:16px; }
+
         .service-card__price { font-family:var(--font-serif); font-size:2.2rem; font-weight:700; color:var(--gold); margin-bottom:20px; letter-spacing:1px; }
+
         .gallery { padding:80px 0; background:var(--dark-surface); }
+
         .gallery__grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
         .gallery__item { position:relative; border-radius:16px; overflow:hidden; aspect-ratio:1/1; border:2px solid transparent; transition:var(--transition); }
+
         .gallery__item img { width:100%; height:100%; object-fit:cover; transition:var(--transition); }
+
         .gallery__item:hover { border-color:var(--gold); transform:scale(1.02); z-index:2; box-shadow:var(--gold-glow); }
+
         .gallery__item:hover img { transform:scale(1.05); }
+
         .gallery__labels { position:absolute; bottom:12px; left:12px; right:12px; display:flex; justify-content:space-between; pointer-events:none; }
+
         .gallery__label { font-size:0.65rem; font-weight:700; letter-spacing:1px; text-transform:uppercase; padding:4px 12px; border-radius:30px; backdrop-filter:blur(8px); background:rgba(0,0,0,0.6); color:#fff; border:1px solid rgba(255,255,255,0.1); }
+
         .gallery__label--before { background:rgba(255,50,50,0.8); }
+
         .gallery__label--after { background:rgba(50,255,100,0.8); color:#000; }
+
         .affiliates { padding:80px 0; background:var(--dark-bg); }
+
         .affiliates__grid { display:grid; grid-template-columns:1fr; gap:40px; background:var(--dark-card); padding:40px 32px; border-radius:28px; border:1px solid rgba(212,175,55,0.1); box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+
         .affiliates__info { display:flex; flex-direction:column; gap:24px; }
+
         .affiliates__earn { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+
         .affiliates__big-number { font-family:var(--font-serif); font-size:3.5rem; font-weight:900; background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; line-height:1; }
+
         .affiliates__earn p { font-size:1.2rem; color:#A0A0A0; font-weight:300; }
+
         .affiliates__breakdown { background:rgba(0,0,0,0.3); padding:24px; border-radius:16px; border-left:3px solid var(--gold); }
+
         .affiliates__breakdown h4 { color:var(--white); font-size:0.9rem; text-transform:uppercase; letter-spacing:2px; margin-bottom:12px; font-weight:600; }
+
         .affiliates__breakdown ul { list-style:none; display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; }
+
         .affiliates__breakdown ul li { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.95rem; }
+
         .affiliates__breakdown ul li span { color:#A0A0A0; }
+
         .affiliates__breakdown ul li strong { color:var(--gold); }
+
         .affiliates__note { display:flex; align-items:center; gap:8px; margin-top:16px; font-size:0.85rem; color:#888; background:rgba(255,255,255,0.03); padding:8px 16px; border-radius:30px; border:1px dashed rgba(255,255,255,0.1); }
+
         .affiliates__note strong { color:var(--white); }
+
         .affiliates__cta-box { display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; padding:24px; background:rgba(212,175,55,0.05); border-radius:16px; border:1px solid rgba(212,175,55,0.15); }
+
         .affiliates__cta-box h4 { font-family:var(--font-serif); font-size:1.6rem; color:var(--white); margin-bottom:16px; }
+
         .affiliates__steps { list-style:none; text-align:left; width:100%; max-width:280px; margin-bottom:28px; }
+
         .affiliates__steps li { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-weight:300; color:#B0B0B0; }
+
         .affiliates__steps li span { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px; background:var(--gold-gradient); color:#000; font-weight:700; border-radius:50%; flex-shrink:0; font-size:0.9rem; }
+
         .footer { background:#050505; padding:60px 0 24px; border-top:1px solid rgba(212,175,55,0.1); }
+
         .footer__container { display:grid; grid-template-columns:1fr; gap:40px; }
+
         .footer__brand h3 { font-family:var(--font-serif); font-size:1.8rem; font-weight:700; background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:8px; }
+
         .footer__brand p { color:#666; font-size:0.9rem; max-width:300px; }
+
         .footer__links { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+
         .footer__col h4 { color:var(--white); font-size:0.9rem; text-transform:uppercase; letter-spacing:2px; margin-bottom:12px; font-weight:600; }
+
         .footer__col a, .footer__col span { display:block; color:#888; font-size:0.9rem; padding:4px 0; transition:var(--transition); }
+
         .footer__col a:hover { color:var(--gold); }
+
         .footer__bottom { grid-column:1/-1; text-align:center; padding-top:24px; border-top:1px solid rgba(255,255,255,0.05); font-size:0.8rem; color:#444; }
+
         .footer__bottom a { color:#666; text-decoration:underline; transition:var(--transition); }
+
         .footer__bottom a:hover { color:var(--gold); }
+
         .modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(5px); z-index:1000; justify-content:center; align-items:center; padding:20px; }
+
         .modal-overlay.active { display:flex; }
+
         .modal { background:var(--dark-card); max-width:650px; width:100%; border-radius:24px; padding:40px 32px; border:1px solid rgba(212,175,55,0.2); box-shadow:0 20px 60px rgba(0,0,0,0.9); position:relative; max-height:95vh; overflow-y:auto; }
+
         .modal-close { position:absolute; top:16px; right:20px; background:none; border:none; color:#888; font-size:1.8rem; cursor:pointer; transition:var(--transition); }
+
         .modal-close:hover { color:var(--white); }
+
         .modal h2 { font-family:var(--font-serif); font-size:1.8rem; color:var(--white); margin-bottom:4px; }
+
         .modal p.sub { color:#888; margin-bottom:24px; }
+
         .form-group { margin-bottom:16px; }
+
         .form-group label { display:block; font-size:0.85rem; font-weight:600; color:#aaa; margin-bottom:4px; }
+
         .form-group input, .form-group select, .form-group textarea { width:100%; padding:12px 16px; border-radius:12px; border:1px solid #2a2a2a; background:#0f0f0f; color:#fff; font-size:1rem; font-family:var(--font-sans); transition:var(--transition); outline:none; }
+
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,0.15); }
+
         .form-group textarea { resize:vertical; min-height:60px; }
+
         .modal .btn--gold { width:100%; margin-top:8px; padding:16px; font-size:1.1rem; }
+
         .hidden-field { display:none; }
+
         .invoice-box { background:#111; border:2px dashed var(--gold); border-radius:16px; padding:24px; margin:20px 0; color:#ddd; }
+
         .invoice-box .row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #222; }
+
         .invoice-box .row.total { border-bottom:2px solid var(--gold); font-weight:700; color:var(--gold); font-size:1.2rem; }
+
         .invoice-box .label { color:#888; }
+
         .invoice-actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:16px; }
+
         .invoice-actions .btn { flex:1; min-width:140px; }
+
         .payfast-form { margin-top:16px; padding:16px; background:#0a0a0a; border-radius:12px; border:1px solid #2a2a2a; }
+
         .payfast-form input[type="submit"] { width:100%; padding:14px; background:var(--gold-gradient); color:#000; border:none; border-radius:50px; font-weight:700; font-size:1.1rem; cursor:pointer; transition:0.3s; }
+
         .payfast-form input[type="submit"]:hover { transform:scale(1.02); box-shadow:var(--gold-glow); }
+
         .cash-note { background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2); border-radius:12px; padding:16px; margin-top:16px; color:#ccc; font-size:0.95rem; }
+
         .cash-note strong { color:var(--gold); }
+
         .success-message { display:none; background:rgba(40,167,69,0.1); border:1px solid #28a745; border-radius:12px; padding:20px; text-align:center; margin:20px 0; }
+
         .success-message h3 { color:#28a745; margin-bottom:8px; }
+
         .price-calculator { background:rgba(212,175,55,0.05); border:1px solid rgba(212,175,55,0.15); border-radius:12px; padding:16px; margin-bottom:16px; }
+
         .price-calculator .total-price { font-size:1.5rem; font-weight:700; color:var(--gold); text-align:center; }
+
         .service-row { display:flex; gap:12px; align-items:center; margin-bottom:8px; flex-wrap:wrap; background:rgba(255,255,255,0.02); padding:8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); }
+
         .service-row select { flex:2; min-width:150px; }
+
         .service-row input[type="number"] { flex:1; min-width:60px; max-width:100px; padding:8px 12px; border-radius:8px; border:1px solid #2a2a2a; background:#0f0f0f; color:#fff; font-size:1rem; }
+
         .service-row .price-tag { color:var(--gold); font-weight:600; min-width:60px; font-size:0.9rem; }
+
         .add-service-btn { background:transparent; border:1px dashed #333; color:#888; padding:8px 16px; border-radius:30px; cursor:pointer; transition:0.3s; font-size:0.85rem; width:100%; margin-top:4px; }
+
         .add-service-btn:hover { border-color:var(--gold); color:var(--gold); }
+
         .remove-service-btn { background:transparent; border:none; color:#ff4d4d; cursor:pointer; font-size:1.2rem; padding:0 4px; }
+
         .remove-service-btn:hover { color:#ff6b6b; }
+
         @media (min-width:640px) { .gallery__grid { grid-template-columns:repeat(3,1fr); } .gallery__item:nth-child(1) { grid-column:span 2; } .gallery__item:nth-child(4) { grid-column:span 2; } }
+
         @media (min-width:768px) { .services__grid { grid-template-columns:1fr 1fr; } .affiliates__grid { grid-template-columns:3fr 2fr; align-items:center; } .footer__links { grid-template-columns:repeat(3,1fr); } }
+
         @media (min-width:1024px) { .services__grid { grid-template-columns:repeat(4,1fr); } .affiliates__breakdown ul { grid-template-columns:1fr; } }
+
         @media (max-width:480px) { .hero__top { flex-direction:column; gap:8px; align-items:flex-start; } .btn--large { padding:14px 28px; font-size:1rem; width:100%; justify-content:center; } .service-card { padding:24px 16px; } .affiliates__grid { padding:24px 16px; } .footer__links { grid-template-columns:1fr; } .modal { padding:24px 16px; } .invoice-actions { flex-direction:column; } .service-row { flex-wrap:wrap; } .service-row input[type="number"] { max-width:100%; } }
+
         .btn svg { width:22px; height:22px; flex-shrink:0; }
+
     </style>
+
 </head>
+
 <body>
+
     <!-- ====== HERO ====== -->
+
     <header class="hero" id="home">
+
         <div class="container hero__container">
+
             <div class="hero__top">
+
                 <span class="hero__location">📍 East London, SA</span>
+
                 <span class="hero__social">
+
                     <a href="#" target="_blank">Instagram</a>
+
                     <a href="#" target="_blank">Facebook</a>
+
                 </span>
+
             </div>
+
             <div class="hero__content">
+
                 <h1 class="hero__title">
+
                     <span class="hero__title--gold">THE</span>
+
                     <span class="hero__title--white">SHOE DOC</span>
+
                 </h1>
+
                 <p class="hero__tagline">We give the best shoe cleaning services in East London. Premium care for your sneakers and formal shoes.</p>
+
                 <div style="display:flex; flex-wrap:wrap; gap:16px;">
+
                     <a href="https://wa.me/27825902968" class="btn btn--whatsapp btn--large">
+
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+
                         WhatsApp
+
                     </a>
+
                     <button class="btn btn--gold btn--large" onclick="openBookingModal()">📅 Book Now</button>
+
                 </div>
+
             </div>
+
             <div class="hero__scroll">↓</div>
+
         </div>
+
     </header>
 
+
+
     <!-- ====== OFFER ====== -->
+
     <section class="offer">
+
         <div class="container offer__container">
+
             <span class="offer__badge">🔥 Limited Time</span>
+
             <h2 class="offer__title">30% OFF <span>FIRST CLEANING</span></h2>
+
             <p class="offer__sub">Use code <strong>DOC30</strong> when you book · New customers only</p>
+
         </div>
+
     </section>
+
+
 
     <!-- ====== SERVICES ====== -->
+
     <section class="services" id="services">
+
         <div class="container">
+
             <div class="section__header">
+
                 <span class="section__label">Our Services</span>
+
                 <h2 class="section__title">Prices <span>Per Pair</span></h2>
+
                 <p class="section__desc">Professional cleaning tailored to your shoes</p>
+
             </div>
+
             <div class="services__grid" id="servicesGrid"></div>
+
         </div>
+
     </section>
+
+
 
     <!-- ====== GALLERY ====== -->
+
     <section class="gallery" id="gallery">
+
         <div class="container">
+
             <div class="section__header">
+
                 <span class="section__label">Before &amp; After</span>
+
                 <h2 class="section__title">See The <span>Transformation</span></h2>
+
                 <p class="section__desc">Real results from real customers</p>
+
             </div>
+
             <div class="gallery__grid" id="galleryGrid"></div>
+
         </div>
+
     </section>
+
+
 
     <!-- ====== AFFILIATES ====== -->
+
     <section class="affiliates" id="affiliates">
+
         <div class="container">
+
             <div class="section__header">
+
                 <span class="section__label">💰 Earn With Us</span>
+
                 <h2 class="section__title">Become An <span>Affiliate</span></h2>
+
                 <p class="section__desc">Turn your referrals into real earnings</p>
+
             </div>
+
             <div class="affiliates__grid">
+
                 <div class="affiliates__info">
+
                     <div class="affiliates__earn">
+
                         <span class="affiliates__big-number">R20</span>
+
                         <p>per pair you refer</p>
+
                     </div>
+
                     <div class="affiliates__breakdown">
+
                         <h4>Commission per pair</h4>
+
                         <ul>
+
                             <li><span>Basic Wash</span> <strong>R15</strong></li>
+
                             <li><span>Deep Clean</span> <strong>R20</strong></li>
+
                             <li><span>Premium Care</span> <strong>R30</strong></li>
+
                         </ul>
+
                         <div class="affiliates__note">
+
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+
                             Pays per shoe via EFT · Min payout <strong>R200</strong>
+
                         </div>
+
                     </div>
+
                 </div>
+
                 <div class="affiliates__cta-box">
+
                     <h4>How it works</h4>
+
                     <ol class="affiliates__steps">
+
                         <li><span>1</span> Sign up — Register as affiliate</li>
+
                         <li><span>2</span> Refer — Share your unique code</li>
+
                         <li><span>3</span> Earn — Get paid per pair cleaned</li>
+
                     </ol>
+
                     <a href="affiliate-register.html" class="btn btn--gold btn--large">💰 Join Now</a>
+
                 </div>
+
             </div>
+
         </div>
+
     </section>
 
+
+
     <!-- ====== FOOTER ====== -->
+
     <footer class="footer">
+
         <div class="container footer__container">
+
             <div class="footer__brand">
+
                 <h3>THE SHOE DOC</h3>
+
                 <p>We give the best shoe cleaning services in East London</p>
+
             </div>
+
             <div class="footer__links">
+
                 <div class="footer__col">
+
                     <h4>Contact</h4>
+
                     <a href="tel:+27825902968">082-590-2968</a>
+
                     <a href="https://wa.me/27825902968">WhatsApp</a>
+
                 </div>
+
                 <div class="footer__col">
+
                     <h4>Social</h4>
+
                     <a href="#" target="_blank">Instagram @THESHOEDOC_</a>
+
                     <a href="#" target="_blank">Facebook @THESHOEDOC_</a>
+
                 </div>
+
                 <div class="footer__col">
+
                     <h4>Location & Address</h4>
+
                     <span>123 Oxford Street,</span>
+
                     <span>East London, 5201</span>
+
                     <span>South Africa</span>
+
                 </div>
+
             </div>
+
             <div class="footer__bottom">
+
                 <p>&copy; 2026 THE SHOE DOC. All rights reserved.</p>
+
                 <p style="margin-top:8px; font-size:0.8rem;">
+
                     <a href="index.html">🔐 Login</a> &nbsp;|&nbsp;
+
                     <a href="admin.html">🔐 Admin Panel</a>
+
                 </p>
+
             </div>
+
         </div>
+
     </footer>
 
+
+
     <!-- ====== BOOKING MODAL ====== -->
+
     <div class="modal-overlay" id="bookingModal">
+
         <div class="modal">
+
             <button class="modal-close" onclick="closeBookingModal()">&times;</button>
+
             
+
             <!-- Booking Form -->
+
             <div id="bookingForm">
+
                 <h2>📅 Book Your Cleaning</h2>
+
                 <p class="sub">Add different services with quantities. Mix and match!</p>
+
                 
+
                 <!-- Points Display -->
+
                 <div id="pointsDisplay" style="background:rgba(212,175,55,0.08);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid rgba(212,175,55,0.15);">
+
                     <p style="color:#888;font-size:0.85rem;">
+
                         🏆 <strong>Your Points:</strong> <span id="customerPoints" style="color:var(--gold);font-weight:bold;">0</span>
+
                         <span style="color:#666;font-size:0.75rem;margin-left:8px;">(10 points = R5 discount)</span>
+
                     </p>
+
                     <div id="rewardDiscountDisplay" style="display:none;margin-top:8px;padding-top:8px;border-top:1px solid rgba(212,175,55,0.1);">
+
                         <p style="color:#28a745;font-weight:bold;font-size:0.95rem;">
+
                             🎉 <span id="discountAmount">R0</span> discount applied!
+
                         </p>
+
                     </div>
+
                 </div>
+
                 
-                <form id="bookingFormElement" method="POST" action="https://formspree.io/f/mwlkwyjg">
+
+                <form id="bookingFormElement" method="POST" action="https://formspree.io/f/mwlkwyjg" onsubmit="return false;">
+
                     <div class="form-group">
+
                         <label>Full Name *</label>
+
                         <input type="text" name="name" id="bookName" placeholder="e.g. Thabo M." required />
+
                     </div>
+
                     <div class="form-group">
+
                         <label>Phone Number *</label>
+
                         <input type="tel" name="phone" id="bookPhone" placeholder="082 123 4567" required />
+
                     </div>
+
                     <div class="form-group">
+
                         <label>Email Address *</label>
+
                         <input type="email" name="email" id="bookEmail" placeholder="customer@email.com" required onchange="checkCustomerPoints()" />
+
                     </div>
+
                     
+
                     <!-- ===== SERVICE SELECTOR ===== -->
+
                     <div class="form-group">
+
                         <label>Services & Quantities *</label>
+
                         <div id="servicesContainer">
+
                             <div class="service-row" data-index="0">
+
                                 <select name="service_0" class="service-select">
+
                                     <option value="Basic Wash">🧼 Basic Wash (R60)</option>
+
                                     <option value="Deep Clean">✨ Deep Clean (R100)</option>
+
                                     <option value="Premium Care">👑 Premium Care (R150)</option>
+
                                     <option value="Sole Whitening">⚪ Sole Whitening (R120)</option>
+
                                 </select>
+
                                 <input type="number" name="quantity_0" class="service-quantity" value="1" min="1" max="20" onchange="updatePrice()" />
+
                                 <span class="price-tag" id="price_0">R60</span>
+
                                 <button type="button" class="remove-service-btn" onclick="removeServiceRow(this)" title="Remove this service">✕</button>
+
                             </div>
+
                         </div>
+
                         <button type="button" class="add-service-btn" onclick="addServiceRow()">➕ Add Another Service</button>
+
                         <small style="color:#666; font-size:0.75rem; display:block; margin-top:4px;">Each row = one service type. Add multiple rows for different services.</small>
+
                     </div>
+
                     
+
                     <!-- Price Calculator -->
+
                     <div class="price-calculator">
+
                         <div style="display:flex; justify-content:space-between; padding:4px 0;">
+
                             <span>Total Pairs:</span>
+
                             <span id="totalPairsDisplay">1</span>
+
                         </div>
+
                         <div style="display:flex; justify-content:space-between; padding:4px 0;">
+
                             <span>Subtotal:</span>
+
                             <span id="subtotalDisplay">R60</span>
+
                         </div>
+
                         <div style="display:flex; justify-content:space-between; padding:8px 0; border-top:1px solid rgba(255,255,255,0.1); margin-top:4px;">
+
                             <span style="font-weight:600;">Total Price:</span>
+
                             <span class="total-price" id="totalPriceDisplay">R60</span>
+
                         </div>
+
                         <div style="display:flex; justify-content:space-between; padding:4px 0; font-size:0.8rem; color:#888;">
+
                             <span>Deposit (50%):</span>
+
                             <span id="depositDisplay">R30</span>
+
                         </div>
+
                     </div>
+
                     
+
                     <div class="form-group">
+
                         <label>Delivery Option *</label>
+
                         <select name="deliveryOption" id="deliveryOption" onchange="toggleDeliveryAddress(); updatePrice()">
+
                             <option value="bring">I will bring my shoes (Free)</option>
+
                             <option value="fetch">Fetch my shoes (R40)</option>
+
                         </select>
+
                     </div>
+
                     <div class="form-group hidden-field" id="addressGroup">
+
                         <label>Delivery Address *</label>
+
                         <textarea name="deliveryAddress" id="deliveryAddress" placeholder="Street, suburb, landmarks..."></textarea>
+
                     </div>
+
                     <div class="form-group">
+
                         <label>Payment Method *</label>
+
                         <select name="paymentMethod" id="paymentMethod">
+
                             <option value="payfast">Payfast (Online Deposit)</option>
+
                             <option value="cash">Cash (Pay at Shop)</option>
+
                         </select>
+
                     </div>
+
                     <div class="form-group">
+
                         <label>Affiliate Code (optional)</label>
+
                         <input type="text" name="affiliateCode" id="affiliateCode" placeholder="Enter affiliate code if you have one" />
+
                     </div>
+
                     <div class="form-group">
+
                         <label>Preferred Date *</label>
+
                         <input type="date" name="date" id="bookDate" required />
+
                     </div>
+
                     <div class="form-group">
+
                         <label>Preferred Time *</label>
+
                         <input type="time" name="time" id="bookTime" required />
+
                     </div>
+
                     <div class="form-group">
+
                         <label>Notes (optional)</label>
+
                         <textarea name="notes" id="bookNotes" placeholder="Any special requests..."></textarea>
+
                     </div>
+
                     <input type="hidden" name="_subject" value="New Booking - THE SHOE DOC" />
+
                     <input type="hidden" name="_captcha" value="false" />
-                    <button type="submit" class="btn btn--gold">📅 Book Now</button>
+
+                    <button type="button" class="btn btn--gold" onclick="submitBooking()">📅 Book Now</button>
+
                 </form>
+
                 <p style="color:#666; font-size:0.8rem; margin-top:12px;">⚠️ Deposit (50%) required. You'll receive confirmation after payment.</p>
+
             </div>
+
             
+
             <!-- Success Message -->
+
             <div id="successMessage" class="success-message">
+
                 <h3>✅ Booking Submitted!</h3>
+
                 <p>Your booking has been received. You will receive a confirmation email shortly.</p>
+
                 <button class="btn btn--gold" onclick="closeBookingModal()">Close</button>
+
             </div>
+
         </div>
+
     </div>
 
+
+
     <script>
+
         // ============================================================
+
         // CONFIG & HELPERS
+
         // ============================================================
+
         const DEFAULT_PRICES = { basic: 'R60', deep: 'R100', premium: 'R150', sole: 'R120' };
+
         const DEFAULT_GALLERY = [
+
             'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&h=400&fit=crop&crop=center',
+
             'https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=600&h=400&fit=crop&crop=center',
+
             'https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=600&h=400&fit=crop&crop=center',
+
             'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=400&fit=crop&crop=center',
+
             'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&h=400&fit=crop&crop=center',
+
             'https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&h=400&fit=crop&crop=center'
+
         ];
+
         const DELIVERY_FEE = 40;
+
         let serviceCounter = 1;
 
+
+
         function getData(key, fallback) { const data = localStorage.getItem(key); if (data) { try { return JSON.parse(data); } catch(e) { return fallback; } } return fallback; }
+
         function setData(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+
         function getAffiliates() { return getData('shoeDocAffiliates', []); }
+
         function getCustomers() { return getData('shoeDocCustomers', []); }
 
+
+
         const prices = getData('shoeDocPrices', DEFAULT_PRICES);
+
         const galleryImages = getData('shoeDocGallery', DEFAULT_GALLERY);
 
+
+
         function renderServices() {
+
             const grid = document.getElementById('servicesGrid');
+
             const services = [
+
                 { key: 'basic', icon: '🧼', title: 'Basic Wash', desc: 'Gentle surface clean & deodorise' },
+
                 { key: 'deep', icon: '✨', title: 'Deep Clean', desc: 'Thorough scrub, stain removal & refresh' },
+
                 { key: 'premium', icon: '👑', title: 'Premium Care', desc: 'Full restoration + protect & shine' },
+
                 { key: 'sole', icon: '⚪', title: 'Sole Whitening', desc: 'Restore white soles to like-new' }
+
             ];
+
             grid.innerHTML = '';
+
             services.forEach(s => {
+
                 const price = prices[s.key] || 'R0';
+
                 const card = document.createElement('div');
+
                 card.className = 'service-card';
+
                 card.innerHTML = `
+
                     <span class="service-card__icon">${s.icon}</span>
+
                     <h3 class="service-card__title">${s.title}</h3>
+
                     <p class="service-card__desc">${s.desc}</p>
+
                     <div class="service-card__price">${price}</div>
+
                     <button class="btn btn--outline-gold" onclick="openBookingModal()">Book Now</button>
+
                 `;
+
                 grid.appendChild(card);
+
             });
+
         }
+
+
 
         function renderGallery() {
+
             const grid = document.getElementById('galleryGrid');
+
             grid.innerHTML = '';
+
             galleryImages.forEach((url) => {
+
                 const item = document.createElement('div');
+
                 item.className = 'gallery__item';
+
                 item.innerHTML = `
+
                     <img src="${url}" alt="Before & After shoe cleaning" loading="lazy" />
+
                     <div class="gallery__labels">
+
                         <span class="gallery__label gallery__label--before">Before</span>
+
                         <span class="gallery__label gallery__label--after">After</span>
+
                     </div>
+
                 `;
+
                 grid.appendChild(item);
+
             });
+
         }
+
         renderServices();
+
         renderGallery();
 
+
+
         // ============================================================
+
         // SERVICE ROW MANAGEMENT
+
         // ============================================================
+
         function addServiceRow() {
+
             const container = document.getElementById('servicesContainer');
+
             const index = serviceCounter;
+
             const row = document.createElement('div');
+
             row.className = 'service-row';
+
             row.dataset.index = index;
+
             row.innerHTML = `
+
                 <select name="service_${index}" class="service-select" onchange="updatePrice()">
+
                     <option value="Basic Wash">🧼 Basic Wash (R60)</option>
+
                     <option value="Deep Clean">✨ Deep Clean (R100)</option>
+
                     <option value="Premium Care">👑 Premium Care (R150)</option>
+
                     <option value="Sole Whitening">⚪ Sole Whitening (R120)</option>
+
                 </select>
+
                 <input type="number" name="quantity_${index}" class="service-quantity" value="1" min="1" max="20" onchange="updatePrice()" />
+
                 <span class="price-tag" id="price_${index}">R60</span>
+
                 <button type="button" class="remove-service-btn" onclick="removeServiceRow(this)" title="Remove this service">✕</button>
+
             `;
+
             container.appendChild(row);
+
             serviceCounter++;
+
             updatePrice();
+
         }
+
+
 
         function removeServiceRow(button) {
+
             const rows = document.querySelectorAll('.service-row');
+
             if (rows.length <= 1) {
+
                 alert('You need at least one service.');
+
                 return;
+
             }
+
             button.closest('.service-row').remove();
+
             updatePrice();
+
         }
 
+
+
         // ============================================================
+
         // PRICE CALCULATOR
+
         // ============================================================
+
         function updatePrice() {
+
             const rows = document.querySelectorAll('.service-row');
+
             let totalPairs = 0;
+
             let subtotal = 0;
+
             const priceMap = {
+
                 'Basic Wash': parseInt(prices.basic.replace('R', '')) || 60,
+
                 'Deep Clean': parseInt(prices.deep.replace('R', '')) || 100,
+
                 'Premium Care': parseInt(prices.premium.replace('R', '')) || 150,
+
                 'Sole Whitening': parseInt(prices.sole.replace('R', '')) || 120
+
             };
+
+
 
             rows.forEach((row, idx) => {
+
                 const select = row.querySelector('.service-select');
+
                 const quantity = parseInt(row.querySelector('.service-quantity').value) || 1;
+
                 const service = select.value;
+
                 const pricePerPair = priceMap[service] || 60;
+
                 const totalPrice = pricePerPair * quantity;
+
                 subtotal += totalPrice;
+
                 totalPairs += quantity;
+
                 const priceTag = row.querySelector('.price-tag');
+
                 if (priceTag) {
+
                     priceTag.textContent = 'R' + totalPrice;
+
                 }
+
             });
 
+
+
             const deliveryOpt = document.getElementById('deliveryOption').value;
+
             const deliveryFee = deliveryOpt === 'fetch' ? DELIVERY_FEE : 0;
+
             const total = subtotal + deliveryFee;
+
             const deposit = Math.max(30, Math.round(total * 0.5));
 
+
+
             document.getElementById('totalPairsDisplay').textContent = totalPairs;
+
             document.getElementById('subtotalDisplay').textContent = 'R' + subtotal;
+
             document.getElementById('totalPriceDisplay').textContent = 'R' + total;
+
             document.getElementById('depositDisplay').textContent = 'R' + deposit;
+
         }
 
+
+
         // ============================================================
+
         // REWARDS PROGRAM FUNCTIONS
+
         // ============================================================
+
         function getCustomerRewards(email) {
+
             const rewards = getData('shoeDocRewards', {});
+
             return rewards[email] || { points: 0, total_earned: 0, used: 0 };
+
         }
+
+
 
         function updateCustomerRewards(email, pointsEarned) {
+
             const rewards = getData('shoeDocRewards', {});
+
             if (!rewards[email]) {
+
                 rewards[email] = { points: 0, total_earned: 0, used: 0 };
+
             }
+
             rewards[email].points += pointsEarned;
+
             rewards[email].total_earned += pointsEarned;
+
             setData('shoeDocRewards', rewards);
+
             return rewards[email];
+
         }
+
+
 
         function applyRewardDiscount(email, total) {
+
             const rewards = getData('shoeDocRewards', {});
+
             if (!rewards[email]) return 0;
+
             const points = rewards[email].points || 0;
+
             const discount = Math.floor(points / 10) * 5;
+
             const maxDiscount = total * 0.5;
+
             return Math.min(discount, maxDiscount);
+
         }
+
+
 
         function useRewardPoints(email, pointsUsed) {
+
             const rewards = getData('shoeDocRewards', {});
+
             if (rewards[email]) {
+
                 rewards[email].points -= pointsUsed;
+
                 rewards[email].used += pointsUsed;
+
                 setData('shoeDocRewards', rewards);
+
             }
+
         }
+
+
 
         function checkCustomerPoints() {
+
             const email = document.getElementById('bookEmail').value.trim();
+
             if (email) {
+
                 const rewards = getCustomerRewards(email);
+
                 document.getElementById('customerPoints').textContent = rewards.points || 0;
+
             }
+
         }
 
+
+
         // ============================================================
+
         // MODAL CONTROLS
+
         // ============================================================
+
         function openBookingModal(serviceName) {
+
             document.getElementById('bookingModal').classList.add('active');
+
             document.body.style.overflow = 'hidden';
+
             document.getElementById('bookingForm').style.display = 'block';
+
             document.getElementById('successMessage').style.display = 'none';
+
             
+
             // Reset to one service row
+
             const container = document.getElementById('servicesContainer');
+
             container.innerHTML = '';
+
             serviceCounter = 0;
+
             addServiceRow();
+
             
+
             if (serviceName) {
+
                 const select = container.querySelector('.service-select');
+
                 for (let opt of select.options) { 
+
                     if (opt.value === serviceName) { 
+
                         opt.selected = true; 
+
                         break; 
+
                     } 
+
                 }
+
             }
+
             const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+
             document.getElementById('bookDate').value = tomorrow.toISOString().split('T')[0];
+
             document.getElementById('bookName').value = '';
+
             document.getElementById('bookPhone').value = '';
+
             document.getElementById('bookEmail').value = '';
+
             document.getElementById('bookTime').value = '';
+
             document.getElementById('bookNotes').value = '';
+
             document.getElementById('deliveryAddress').value = '';
+
             document.getElementById('affiliateCode').value = '';
+
             document.getElementById('addressGroup').classList.add('hidden-field');
+
             document.getElementById('rewardDiscountDisplay').style.display = 'none';
+
             document.getElementById('customerPoints').textContent = '0';
+
             updatePrice();
+
         }
+
+
 
         function closeBookingModal() {
+
             document.getElementById('bookingModal').classList.remove('active');
+
             document.body.style.overflow = '';
+
         }
+
         document.getElementById('bookingModal').addEventListener('click', function(e) { if (e.target === this) closeBookingModal(); });
+
         document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeBookingModal(); });
 
+
+
         function toggleDeliveryAddress() {
+
             const val = document.getElementById('deliveryOption').value;
+
             const group = document.getElementById('addressGroup');
+
             if (val === 'fetch') { group.classList.remove('hidden-field'); } else { group.classList.add('hidden-field'); }
+
             updatePrice();
+
         }
+
+
 
         function getServicePrice(serviceName) {
+
             const map = {
+
                 'Basic Wash': parseInt(prices.basic.replace('R', '')) || 60,
+
                 'Deep Clean': parseInt(prices.deep.replace('R', '')) || 100,
+
                 'Premium Care': parseInt(prices.premium.replace('R', '')) || 150,
+
                 'Sole Whitening': parseInt(prices.sole.replace('R', '')) || 120
+
             };
+
             return map[serviceName] || 60;
+
         }
+
+
 
         function getBookingServices() {
+
             const rows = document.querySelectorAll('.service-row');
+
             const services = [];
+
             rows.forEach(row => {
+
                 const select = row.querySelector('.service-select');
+
                 const quantity = parseInt(row.querySelector('.service-quantity').value) || 1;
+
                 services.push({
+
                     service: select.value,
+
                     quantity: quantity
+
                 });
+
             });
+
             return services;
+
         }
+
+
 
         // ============================================================
-        // FORMPREE EMAIL FUNCTIONS
-        // ============================================================
-        const FORMPREE_ENDPOINTS = {
-            customerConfirmation: 'https://formspree.io/f/xoeqprgy',
-            adminNotification: 'https://formspree.io/f/mkjnpyda',
-            paymentConfirmed: 'https://formspree.io/f/mrpgodzz',
-            bookingReady: 'https://formspree.io/f/xbgjpbrj',
-            shoesDelivered: 'https://formspree.io/f/mnpqoran',
-            affiliateEarnings: 'https://formspree.io/f/mdeopjne',
-            rewardUpdate: 'https://formspree.io/f/xqpkgjzb',
-            bookingConfirmed: 'https://formspree.io/f/xyeybvgd',
-            serviceCompleted: 'https://formspree.io/f/xzebkwpj',
-            affiliatePayment: 'https://formspree.io/f/xeaqpdjp'
-        };
 
-        function sendFormspreeEmail(endpoint, data) {
-            const formData = new FormData();
-            Object.keys(data).forEach(key => {
-                formData.append(key, data[key]);
-            });
-            return fetch(endpoint, { method: 'POST', body: formData }).catch(err => console.error('Email send error:', err));
-        }
-
-        function sendCustomerConfirmation(booking) {
-            sendFormspreeEmail(FORMPREE_ENDPOINTS.customerConfirmation, {
-                _subject: '✅ Booking Confirmed - THE SHOE DOC',
-                to: booking.email,
-                customer: booking.customer,
-                services: booking.servicesList,
-                totalPairs: booking.totalPairs,
-                date: booking.date,
-                time: booking.time,
-                total: booking.totalDue
-            });
-        }
-
-        function sendAdminNotification(booking) {
-            sendFormspreeEmail(FORMPREE_ENDPOINTS.adminNotification, {
-                _subject: '📦 New Booking - THE SHOE DOC',
-                to: 'theshoedoc3@gmail.com',
-                customer: booking.customer,
-                phone: booking.phone,
-                email: booking.email,
-                services: booking.servicesList,
-                totalPairs: booking.totalPairs,
-                date: booking.date,
-                time: booking.time,
-                total: booking.totalDue,
-                paymentMethod: booking.paymentMethod
-            });
-        }
-
-        function sendRewardUpdateEmail(booking) {
-            const rewards = getCustomerRewards(booking.email);
-            sendFormspreeEmail(FORMPREE_ENDPOINTS.rewardUpdate, {
-                _subject: '🏆 Reward Points Update - THE SHOE DOC',
-                to: booking.email,
-                name: booking.customer,
-                points_earned: booking.points_earned || 0,
-                total_points: rewards.points || 0
-            });
-        }
+        // SUBMIT BOOKING - Using fetch with POST to Formspree
 
         // ============================================================
-        // SUBMIT BOOKING
-        // ============================================================
+
         function submitBooking() {
+
             const name = document.getElementById('bookName').value.trim();
+
             const phone = document.getElementById('bookPhone').value.trim();
+
             const email = document.getElementById('bookEmail').value.trim();
+
             const date = document.getElementById('bookDate').value;
+
             const time = document.getElementById('bookTime').value;
+
             const notes = document.getElementById('bookNotes').value.trim();
+
             const deliveryOpt = document.getElementById('deliveryOption').value;
+
             const deliveryAddr = document.getElementById('deliveryAddress').value.trim();
+
             const paymentMethod = document.getElementById('paymentMethod').value;
+
             const affiliateCode = document.getElementById('affiliateCode').value.trim().toUpperCase();
 
+
+
             if (!name || !phone || !date || !time || !email) { alert('Please fill in all required fields.'); return; }
+
             if (deliveryOpt === 'fetch' && !deliveryAddr) { alert('Please enter your delivery address.'); return; }
 
+
+
             // Get all services
+
             const serviceRows = document.querySelectorAll('.service-row');
+
             let servicesList = [];
+
             let totalPairs = 0;
+
             let subtotal = 0;
+
             const priceMap = {
+
                 'Basic Wash': parseInt(prices.basic.replace('R', '')) || 60,
+
                 'Deep Clean': parseInt(prices.deep.replace('R', '')) || 100,
+
                 'Premium Care': parseInt(prices.premium.replace('R', '')) || 150,
+
                 'Sole Whitening': parseInt(prices.sole.replace('R', '')) || 120
+
             };
+
+
 
             serviceRows.forEach(row => {
+
                 const select = row.querySelector('.service-select');
+
                 const quantity = parseInt(row.querySelector('.service-quantity').value) || 1;
+
                 const service = select.value;
+
                 const pricePerPair = priceMap[service] || 60;
+
                 servicesList.push({ service, quantity, pricePerPair });
+
                 totalPairs += quantity;
+
                 subtotal += pricePerPair * quantity;
+
             });
 
+
+
             // Calculate discount from rewards
+
             let discount = 0;
+
             let pointsUsed = 0;
+
             if (email) {
+
                 discount = applyRewardDiscount(email, subtotal);
+
                 if (discount > 0) {
+
                     const rewards = getCustomerRewards(email);
+
                     pointsUsed = Math.floor(rewards.points / 10) * 10;
+
                     useRewardPoints(email, pointsUsed);
+
                 }
+
             }
+
+
 
             const deliveryFee = (deliveryOpt === 'fetch') ? DELIVERY_FEE : 0;
+
             const totalAfterDiscount = subtotal - discount + deliveryFee;
+
             const deposit = Math.max(30, Math.round(totalAfterDiscount * 0.5));
+
             const invoiceNum = 'INV-' + Date.now().toString().slice(-8) + '-' + Math.floor(Math.random() * 1000);
+
             const pointsEarned = Math.floor(subtotal / 10);
 
+
+
             // Format services for display
+
             const servicesDisplay = servicesList.map(s => `${s.service} (${s.quantity} pair${s.quantity > 1 ? 's' : ''})`).join(', ');
 
+
+
             const booking = {
+
                 id: Date.now(),
+
                 invoice: invoiceNum,
+
                 customer: name,
+
                 phone: phone,
+
                 email: email,
+
                 servicesList: servicesDisplay,
+
                 totalPairs: totalPairs,
+
                 subtotal: subtotal,
+
                 date: date,
+
                 time: time,
+
                 notes: notes,
+
                 deliveryOption: deliveryOpt,
+
                 deliveryAddress: deliveryAddr || 'N/A',
+
                 deposit: deposit,
+
                 deliveryFee: deliveryFee,
+
                 totalDue: deposit + deliveryFee,
+
                 paymentMethod: paymentMethod,
+
                 affiliate_code: affiliateCode || null,
+
                 discount_applied: discount,
+
                 points_used: pointsUsed,
+
                 points_earned: pointsEarned,
+
                 status: paymentMethod === 'cash' ? 'confirmed' : 'pending_payment',
+
                 createdAt: new Date().toISOString(),
+
                 paid: false,
+
                 lastReminder: null
+
             };
+
             let bookings = getData('shoeDocBookings', []);
+
             bookings.push(booking);
+
             setData('shoeDocBookings', bookings);
 
+
+
             // Update rewards
+
             if (email) {
+
                 updateCustomerRewards(email, pointsEarned);
-                sendRewardUpdateEmail(booking);
+
             }
+
+
 
             // Increment analytics
+
             let analytics = getData('shoeDocAnalytics', { visitors: 0, registrations: 0, bookings: 0 });
+
             analytics.bookings = (analytics.bookings || 0) + 1;
+
             setData('shoeDocAnalytics', analytics);
 
-            // Send emails
-            sendAdminNotification(booking);
-            sendCustomerConfirmation(booking);
+
+
+            // Send emails using Formspree AJAX
+
+            sendEmails(booking);
+
+
 
             if (paymentMethod === 'cash') {
+
                 alert('✅ Booking confirmed! A confirmation email has been sent to you.');
+
             }
+
+
 
             document.getElementById('bookingForm').style.display = 'none';
+
             document.getElementById('successMessage').style.display = 'block';
+
         }
 
-        // ============================================================
-        // FORM SUBMISSION
-        // ============================================================
-        document.getElementById('bookingFormElement').addEventListener('submit', function(e) {
-            e.preventDefault();
-            submitBooking();
-        });
+
 
         // ============================================================
-        // PAYMENT RETURN HANDLING
+
+        // SEND EMAILS VIA FORMPREE - Using hidden iframe method
+
         // ============================================================
-        function checkPaymentReturn() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const invoice = urlParams.get('m_payment_id');
-            const paymentStatus = urlParams.get('payment_status');
-            if (invoice && (paymentStatus === 'COMPLETE' || paymentStatus === 'COMPLETED' || paymentStatus === 'success' || !paymentStatus)) {
-                let bookings = getData('shoeDocBookings', []);
-                const booking = bookings.find(b => b.invoice === invoice);
-                if (booking && !booking.paid) {
-                    booking.paid = true;
-                    booking.status = 'paid';
-                    setData('shoeDocBookings', bookings);
-                    sendFormspreeEmail(FORMPREE_ENDPOINTS.paymentConfirmed, {
-                        _subject: '💰 Payment Confirmed - THE SHOE DOC',
-                        to: booking.email,
-                        customer: booking.customer,
-                        amount: booking.deposit,
-                        services: booking.servicesList,
-                        date: booking.date,
-                        time: booking.time
-                    });
-                    alert('✅ Payment successful! Your booking is confirmed. A confirmation email has been sent to you.');
-                }
-                window.history.replaceState({}, document.title, window.location.pathname);
+
+        function sendEmails(booking) {
+
+            // Send Admin Notification
+
+            const adminForm = document.createElement('form');
+
+            adminForm.method = 'POST';
+
+            adminForm.action = 'https://formspree.io/f/mkjnpyda';
+
+            adminForm.target = 'hiddenFrame';
+
+            adminForm.style.display = 'none';
+
+            
+
+            const adminData = {
+
+                _subject: '📦 New Booking - THE SHOE DOC',
+
+                customer: booking.customer,
+
+                phone: booking.phone,
+
+                email: booking.email,
+
+                services: booking.servicesList,
+
+                totalPairs: booking.totalPairs,
+
+                date: booking.date,
+
+                time: booking.time,
+
+                total: booking.totalDue,
+
+                paymentMethod: booking.paymentMethod
+
+            };
+
+            
+
+            Object.keys(adminData).forEach(key => {
+
+                const input = document.createElement('input');
+
+                input.type = 'hidden';
+
+                input.name = key;
+
+                input.value = adminData[key];
+
+                adminForm.appendChild(input);
+
+            });
+
+            document.body.appendChild(adminForm);
+
+            adminForm.submit();
+
+            document.body.removeChild(adminForm);
+
+
+
+            // Send Customer Confirmation
+
+            const customerForm = document.createElement('form');
+
+            customerForm.method = 'POST';
+
+            customerForm.action = 'https://formspree.io/f/xoeqprgy';
+
+            customerForm.target = 'hiddenFrame';
+
+            customerForm.style.display = 'none';
+
+            
+
+            const customerData = {
+
+                _subject: '✅ Booking Confirmed - THE SHOE DOC',
+
+                to: booking.email,
+
+                customer: booking.customer,
+
+                services: booking.servicesList,
+
+                totalPairs: booking.totalPairs,
+
+                date: booking.date,
+
+                time: booking.time,
+
+                total: booking.totalDue
+
+            };
+
+            
+
+            Object.keys(customerData).forEach(key => {
+
+                const input = document.createElement('input');
+
+                input.type = 'hidden';
+
+                input.name = key;
+
+                input.value = customerData[key];
+
+                customerForm.appendChild(input);
+
+            });
+
+            document.body.appendChild(customerForm);
+
+            customerForm.submit();
+
+            document.body.removeChild(customerForm);
+
+
+
+            // Send Reward Update (if applicable)
+
+            if (booking.points_earned > 0) {
+
+                const rewardForm = document.createElement('form');
+
+                rewardForm.method = 'POST';
+
+                rewardForm.action = 'https://formspree.io/f/xqpkgjzb';
+
+                rewardForm.target = 'hiddenFrame';
+
+                rewardForm.style.display = 'none';
+
+                
+
+                const rewardData = {
+
+                    _subject: '🏆 Reward Points Update - THE SHOE DOC',
+
+                    to: booking.email,
+
+                    name: booking.customer,
+
+                    points_earned: booking.points_earned,
+
+                    total_points: getCustomerRewards(booking.email).points || 0
+
+                };
+
+                
+
+                Object.keys(rewardData).forEach(key => {
+
+                    const input = document.createElement('input');
+
+                    input.type = 'hidden';
+
+                    input.name = key;
+
+                    input.value = rewardData[key];
+
+                    rewardForm.appendChild(input);
+
+                });
+
+                document.body.appendChild(rewardForm);
+
+                rewardForm.submit();
+
+                document.body.removeChild(rewardForm);
+
             }
+
         }
+
+
+
+        // ============================================================
+
+        // PAYMENT RETURN HANDLING
+
+        // ============================================================
+
+        function checkPaymentReturn() {
+
+            const urlParams = new URLSearchParams(window.location.search);
+
+            const invoice = urlParams.get('m_payment_id');
+
+            const paymentStatus = urlParams.get('payment_status');
+
+            if (invoice && (paymentStatus === 'COMPLETE' || paymentStatus === 'COMPLETED' || paymentStatus === 'success' || !paymentStatus)) {
+
+                let bookings = getData('shoeDocBookings', []);
+
+                const booking = bookings.find(b => b.invoice === invoice);
+
+                if (booking && !booking.paid) {
+
+                    booking.paid = true;
+
+                    booking.status = 'paid';
+
+                    setData('shoeDocBookings', bookings);
+
+                    
+
+                    // Send payment confirmation using hidden form
+
+                    const paymentForm = document.createElement('form');
+
+                    paymentForm.method = 'POST';
+
+                    paymentForm.action = 'https://formspree.io/f/mrpgodzz';
+
+                    paymentForm.target = 'hiddenFrame';
+
+                    paymentForm.style.display = 'none';
+
+                    
+
+                    const paymentData = {
+
+                        _subject: '💰 Payment Confirmed - THE SHOE DOC',
+
+                        to: booking.email,
+
+                        customer: booking.customer,
+
+                        amount: booking.deposit,
+
+                        services: booking.servicesList,
+
+                        date: booking.date,
+
+                        time: booking.time
+
+                    };
+
+                    
+
+                    Object.keys(paymentData).forEach(key => {
+
+                        const input = document.createElement('input');
+
+                        input.type = 'hidden';
+
+                        input.name = key;
+
+                        input.value = paymentData[key];
+
+                        paymentForm.appendChild(input);
+
+                    });
+
+                    document.body.appendChild(paymentForm);
+
+                    paymentForm.submit();
+
+                    document.body.removeChild(paymentForm);
+
+                    
+
+                    alert('✅ Payment successful! Your booking is confirmed. A confirmation email has been sent to you.');
+
+                }
+
+                window.history.replaceState({}, document.title, window.location.pathname);
+
+            }
+
+        }
+
+
+
+        // Create hidden iframe for form submissions
+
+        function createHiddenFrame() {
+
+            const iframe = document.createElement('iframe');
+
+            iframe.name = 'hiddenFrame';
+
+            iframe.style.display = 'none';
+
+            document.body.appendChild(iframe);
+
+        }
+
+
 
         window.onload = function() { 
+
+            createHiddenFrame();
+
             checkPaymentReturn(); 
+
+            updatePrice();
+
         };
+
     </script>
+
 </body>
+
 </html>
