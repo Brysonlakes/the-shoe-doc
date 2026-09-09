@@ -549,15 +549,254 @@
         }
 
         // ============================================================
+        // FORMPREE EMAIL FUNCTIONS
+        // ============================================================
+        const FORMPREE_ENDPOINTS = {
+            customerConfirmation: 'https://formspree.io/f/xoeqprgy',
+            adminNotification: 'https://formspree.io/f/mkjnpyda',
+            paymentConfirmed: 'https://formspree.io/f/mrpgodzz',
+            bookingReady: 'https://formspree.io/f/xbgjpbrj',
+            shoesDelivered: 'https://formspree.io/f/mnpqoran',
+            affiliateEarnings: 'https://formspree.io/f/mdeopjne',
+            rewardUpdate: 'https://formspree.io/f/xqpkgjzb',
+            bookingConfirmed: 'https://formspree.io/f/xyeybvgd',
+            serviceCompleted: 'https://formspree.io/f/xzebkwpj',
+            affiliatePayment: 'https://formspree.io/f/xeaqpdjp'
+        };
+
+        function sendFormspreeEmail(endpoint, data) {
+            const formData = new FormData();
+            Object.keys(data).forEach(key => {
+                formData.append(key, data[key]);
+            });
+            
+            return fetch(endpoint, {
+                method: 'POST',
+                body: formData
+            }).catch(err => console.error('Email send error:', err));
+        }
+
+        // ----- Customer Confirmation -----
+        function sendCustomerConfirmation(booking) {
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.customerConfirmation, {
+                _subject: '✅ Booking Confirmed - THE SHOE DOC',
+                to: booking.email,
+                customer: booking.customer,
+                service: booking.service,
+                date: booking.date,
+                time: booking.time,
+                total: booking.totalDue
+            }).catch(err => console.error('Email send error:', err));
+        }
+
+        // ----- Admin Notification -----
+        function sendAdminNotification(booking) {
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.adminNotification, {
+                _subject: '📦 New Booking - THE SHOE DOC',
+                to: 'theshoedoc3@gmail.com',
+                customer: booking.customer,
+                phone: booking.phone,
+                email: booking.email,
+                service: booking.service,
+                date: booking.date,
+                time: booking.time,
+                total: booking.totalDue,
+                paymentMethod: booking.paymentMethod
+            }).catch(err => console.error('Email send error:', err));
+        }
+
+        // ----- Payment Confirmed -----
+        function sendPaymentConfirmedEmail(booking) {
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.paymentConfirmed, {
+                _subject: '💰 Payment Confirmed - THE SHOE DOC',
+                to: booking.email,
+                customer: booking.customer,
+                amount: booking.deposit,
+                service: booking.service,
+                date: booking.date,
+                time: booking.time
+            }).catch(err => console.error('Email send error:', err));
+        }
+
+        // ----- Booking Ready for Pickup -----
+        function sendBookingReadyEmail(booking) {
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.bookingReady, {
+                _subject: '📦 Ready for Pickup - THE SHOE DOC',
+                to: booking.email,
+                customer: booking.customer
+            }).catch(err => console.error('Email send error:', err));
+        }
+
+        // ----- Shoes Delivered -----
+        function sendDeliveredEmail(booking) {
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.shoesDelivered, {
+                _subject: '📦 Shoes Delivered - THE SHOE DOC',
+                to: booking.email,
+                customer: booking.customer
+            }).catch(err => console.error('Email send error:', err));
+        }
+
+        // ----- Affiliate Earnings -----
+        function sendAffiliateEarningsEmail(affiliate, customer, amount, type) {
+            const typeLabel = type === 'direct' ? 'Direct Referral' : 'Downline Commission';
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.affiliateEarnings, {
+                _subject: '💰 Affiliate Earnings - THE SHOE DOC',
+                to: affiliate.email,
+                name: affiliate.name,
+                amount: amount,
+                customer: customer,
+                balance: affiliate.balance || 0,
+                affiliate_code: affiliate.affiliate_code,
+                type: typeLabel
+            }).catch(err => console.error('Email send error:', err));
+        }
+
+        // ----- Reward Update -----
+        function sendRewardUpdateEmail(booking) {
+            const rewards = getCustomerRewards(booking.email);
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.rewardUpdate, {
+                _subject: '🏆 Reward Points Update - THE SHOE DOC',
+                to: booking.email,
+                name: booking.customer,
+                points_earned: booking.points_earned || 0,
+                total_points: rewards.points || 0
+            }).catch(err => console.error('Email send error:', err));
+        }
+
+        // ----- Booking Confirmed (Admin action) -----
+        function sendBookingConfirmedEmail(booking) {
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.bookingConfirmed, {
+                _subject: '✅ Booking Confirmed - THE SHOE DOC',
+                to: booking.email,
+                customer: booking.customer,
+                service: booking.service,
+                date: booking.date,
+                time: booking.time
+            }).catch(err => console.error('Email send error:', err));
+        }
+
+        // ----- Service Completed -----
+        function sendBookingCompletedEmail(booking) {
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.serviceCompleted, {
+                _subject: '✔️ Service Completed - THE SHOE DOC',
+                to: booking.email,
+                customer: booking.customer,
+                service: booking.service
+            }).catch(err => console.error('Email send error:', err));
+        }
+
+        // ----- Affiliate Payment -----
+        function sendAffiliatePaymentEmail(affiliate, amount, note) {
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.affiliatePayment, {
+                _subject: '💰 Affiliate Payment - THE SHOE DOC',
+                to: affiliate.email,
+                name: affiliate.name,
+                amount: amount,
+                balance: affiliate.balance || 0,
+                note: note,
+                affiliate_code: affiliate.affiliate_code
+            }).catch(err => console.error('Email send error:', err));
+        }
+
+        // ============================================================
+        // SUBMIT BOOKING
+        // ============================================================
+        function submitBooking() {
+            const name = document.getElementById('bookName').value.trim();
+            const phone = document.getElementById('bookPhone').value.trim();
+            const email = document.getElementById('bookEmail').value.trim();
+            const service = document.getElementById('bookService').value;
+            const date = document.getElementById('bookDate').value;
+            const time = document.getElementById('bookTime').value;
+            const notes = document.getElementById('bookNotes').value.trim();
+            const deliveryOpt = document.getElementById('deliveryOption').value;
+            const deliveryAddr = document.getElementById('deliveryAddress').value.trim();
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            const affiliateCode = document.getElementById('affiliateCode').value.trim().toUpperCase();
+
+            if (!name || !phone || !date || !time || !email) { alert('Please fill in all required fields.'); return; }
+            if (deliveryOpt === 'fetch' && !deliveryAddr) { alert('Please enter your delivery address.'); return; }
+
+            const price = getServicePrice(service);
+            
+            // Calculate discount from rewards
+            let discount = 0;
+            let pointsUsed = 0;
+            if (email) {
+                discount = applyRewardDiscount(email, price);
+                if (discount > 0) {
+                    const rewards = getCustomerRewards(email);
+                    pointsUsed = Math.floor(rewards.points / 10) * 10;
+                    useRewardPoints(email, pointsUsed);
+                }
+            }
+
+            // Calculate deposit
+            const deposit = Math.max(30, Math.round((price - discount) * 0.5));
+            const deliveryFee = (deliveryOpt === 'fetch') ? DELIVERY_FEE : 0;
+            const totalDue = deposit + deliveryFee;
+            const invoiceNum = 'INV-' + Date.now().toString().slice(-8) + '-' + Math.floor(Math.random() * 1000);
+            const pointsEarned = Math.floor(price / 10);
+
+            const booking = {
+                id: Date.now(),
+                invoice: invoiceNum,
+                customer: name,
+                phone: phone,
+                email: email,
+                service: service,
+                date: date,
+                time: time,
+                notes: notes,
+                deliveryOption: deliveryOpt,
+                deliveryAddress: deliveryAddr || 'N/A',
+                deposit: deposit,
+                deliveryFee: deliveryFee,
+                totalDue: totalDue,
+                paymentMethod: paymentMethod,
+                affiliate_code: affiliateCode || null,
+                discount_applied: discount,
+                points_used: pointsUsed,
+                points_earned: pointsEarned,
+                status: paymentMethod === 'cash' ? 'confirmed' : 'pending_payment',
+                createdAt: new Date().toISOString(),
+                paid: false,
+                lastReminder: null
+            };
+            let bookings = getData('shoeDocBookings', []);
+            bookings.push(booking);
+            setData('shoeDocBookings', bookings);
+
+            // Update rewards
+            if (email) {
+                updateCustomerRewards(email, pointsEarned);
+                sendRewardUpdateEmail(booking);
+            }
+
+            // Increment analytics
+            let analytics = getData('shoeDocAnalytics', { visitors: 0, registrations: 0, bookings: 0 });
+            analytics.bookings = (analytics.bookings || 0) + 1;
+            setData('shoeDocAnalytics', analytics);
+
+            // Send emails
+            sendAdminNotification(booking);
+            sendCustomerConfirmation(booking);
+
+            if (paymentMethod === 'cash') {
+                alert('✅ Booking confirmed! A confirmation email has been sent to you.');
+            }
+
+            // Show success message
+            document.getElementById('bookingForm').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'block';
+        }
+
+        // ============================================================
         // FORM SUBMISSION - SUCCESS MESSAGE
         // ============================================================
         document.getElementById('bookingFormElement').addEventListener('submit', function(e) {
-            // Let Formspree handle the submission
-            // Show success message after a short delay
-            setTimeout(() => {
-                document.getElementById('bookingForm').style.display = 'none';
-                document.getElementById('successMessage').style.display = 'block';
-            }, 500);
+            e.preventDefault(); // Prevent default form submission
+            submitBooking(); // Call our custom function
         });
 
         // ============================================================
@@ -574,6 +813,7 @@
                     booking.paid = true;
                     booking.status = 'paid';
                     setData('shoeDocBookings', bookings);
+                    sendPaymentConfirmedEmail(booking);
                     alert('✅ Payment successful! Your booking is confirmed. A confirmation email has been sent to you.');
                 }
                 window.history.replaceState({}, document.title, window.location.pathname);
@@ -582,6 +822,10 @@
 
         window.onload = function() { 
             checkPaymentReturn(); 
+        };
+    </script>
+</body>
+</html>
         };
     </script>
 </body>
