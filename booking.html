@@ -140,6 +140,8 @@
         .cash-note strong { color:var(--gold); }
         .success-message { display:none; background:rgba(40,167,69,0.1); border:1px solid #28a745; border-radius:12px; padding:20px; text-align:center; margin:20px 0; }
         .success-message h3 { color:#28a745; margin-bottom:8px; }
+        .price-calculator { background:rgba(212,175,55,0.05); border:1px solid rgba(212,175,55,0.15); border-radius:12px; padding:16px; margin-bottom:16px; }
+        .price-calculator .total-price { font-size:1.5rem; font-weight:700; color:var(--gold); text-align:center; }
         @media (min-width:640px) { .gallery__grid { grid-template-columns:repeat(3,1fr); } .gallery__item:nth-child(1) { grid-column:span 2; } .gallery__item:nth-child(4) { grid-column:span 2; } }
         @media (min-width:768px) { .services__grid { grid-template-columns:1fr 1fr; } .affiliates__grid { grid-template-columns:3fr 2fr; align-items:center; } .footer__links { grid-template-columns:repeat(3,1fr); } }
         @media (min-width:1024px) { .services__grid { grid-template-columns:repeat(4,1fr); } .affiliates__breakdown ul { grid-template-columns:1fr; } }
@@ -320,18 +322,47 @@
                         <label>Email Address *</label>
                         <input type="email" name="email" id="bookEmail" placeholder="customer@email.com" required onchange="checkCustomerPoints()" />
                     </div>
+                    
+                    <!-- ===== NEW: NUMBER OF PAIRS ===== -->
+                    <div class="form-group">
+                        <label>Number of Pairs *</label>
+                        <input type="number" name="pairs" id="bookPairs" value="1" min="1" max="20" required onchange="updatePrice()" />
+                        <small style="color:#666; font-size:0.75rem;">Max 20 pairs per booking</small>
+                    </div>
+                    
                     <div class="form-group">
                         <label>Service *</label>
-                        <select name="service" id="bookService">
-                            <option value="Basic Wash">Basic Wash (R60)</option>
-                            <option value="Deep Clean">Deep Clean (R100)</option>
-                            <option value="Premium Care">Premium Care (R150)</option>
-                            <option value="Sole Whitening">Sole Whitening (R120)</option>
+                        <select name="service" id="bookService" onchange="updatePrice()">
+                            <option value="Basic Wash">Basic Wash (R60/pair)</option>
+                            <option value="Deep Clean">Deep Clean (R100/pair)</option>
+                            <option value="Premium Care">Premium Care (R150/pair)</option>
+                            <option value="Sole Whitening">Sole Whitening (R120/pair)</option>
                         </select>
                     </div>
+                    
+                    <!-- Price Calculator -->
+                    <div class="price-calculator">
+                        <div style="display:flex; justify-content:space-between; padding:4px 0;">
+                            <span>Price per pair:</span>
+                            <span id="pricePerPair">R60</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; padding:4px 0;">
+                            <span>Number of pairs:</span>
+                            <span id="displayPairs">1</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; padding:8px 0; border-top:1px solid rgba(255,255,255,0.1); margin-top:4px;">
+                            <span style="font-weight:600;">Total Price:</span>
+                            <span class="total-price" id="totalPriceDisplay">R60</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; padding:4px 0; font-size:0.8rem; color:#888;">
+                            <span>Deposit (50%):</span>
+                            <span id="depositDisplay">R30</span>
+                        </div>
+                    </div>
+                    
                     <div class="form-group">
                         <label>Delivery Option *</label>
-                        <select name="deliveryOption" id="deliveryOption" onchange="toggleDeliveryAddress()">
+                        <select name="deliveryOption" id="deliveryOption" onchange="toggleDeliveryAddress(); updatePrice()">
                             <option value="bring">I will bring my shoes (Free)</option>
                             <option value="fetch">Fetch my shoes (R40)</option>
                         </select>
@@ -446,6 +477,32 @@
         renderGallery();
 
         // ============================================================
+        // PRICE CALCULATOR
+        // ============================================================
+        function updatePrice() {
+            const service = document.getElementById('bookService').value;
+            const pairs = parseInt(document.getElementById('bookPairs').value) || 1;
+            const deliveryOpt = document.getElementById('deliveryOption').value;
+            
+            const priceMap = {
+                'Basic Wash': parseInt(prices.basic.replace('R', '')) || 60,
+                'Deep Clean': parseInt(prices.deep.replace('R', '')) || 100,
+                'Premium Care': parseInt(prices.premium.replace('R', '')) || 150,
+                'Sole Whitening': parseInt(prices.sole.replace('R', '')) || 120
+            };
+            
+            const pricePerPair = priceMap[service] || 60;
+            const totalPrice = pricePerPair * pairs;
+            const deliveryFee = deliveryOpt === 'fetch' ? DELIVERY_FEE : 0;
+            const deposit = Math.max(30, Math.round(totalPrice * 0.5));
+            
+            document.getElementById('pricePerPair').textContent = 'R' + pricePerPair;
+            document.getElementById('displayPairs').textContent = pairs;
+            document.getElementById('totalPriceDisplay').textContent = 'R' + (totalPrice + deliveryFee);
+            document.getElementById('depositDisplay').textContent = 'R' + deposit;
+        }
+
+        // ============================================================
         // REWARDS PROGRAM FUNCTIONS
         // ============================================================
         function getCustomerRewards(email) {
@@ -487,15 +544,6 @@
             if (email) {
                 const rewards = getCustomerRewards(email);
                 document.getElementById('customerPoints').textContent = rewards.points || 0;
-                const service = document.getElementById('bookService').value;
-                const price = getServicePrice(service);
-                const discount = applyRewardDiscount(email, price);
-                if (discount > 0) {
-                    document.getElementById('discountAmount').textContent = 'R' + discount;
-                    document.getElementById('rewardDiscountDisplay').style.display = 'block';
-                } else {
-                    document.getElementById('rewardDiscountDisplay').style.display = 'none';
-                }
             }
         }
 
@@ -520,9 +568,11 @@
             document.getElementById('bookNotes').value = '';
             document.getElementById('deliveryAddress').value = '';
             document.getElementById('affiliateCode').value = '';
+            document.getElementById('bookPairs').value = 1;
             document.getElementById('addressGroup').classList.add('hidden-field');
             document.getElementById('rewardDiscountDisplay').style.display = 'none';
             document.getElementById('customerPoints').textContent = '0';
+            updatePrice();
         }
 
         function closeBookingModal() {
@@ -536,6 +586,7 @@
             const val = document.getElementById('deliveryOption').value;
             const group = document.getElementById('addressGroup');
             if (val === 'fetch') { group.classList.remove('hidden-field'); } else { group.classList.add('hidden-field'); }
+            updatePrice();
         }
 
         function getServicePrice(serviceName) {
@@ -576,20 +627,19 @@
             }).catch(err => console.error('Email send error:', err));
         }
 
-        // ----- Customer Confirmation -----
         function sendCustomerConfirmation(booking) {
             sendFormspreeEmail(FORMPREE_ENDPOINTS.customerConfirmation, {
                 _subject: '✅ Booking Confirmed - THE SHOE DOC',
                 to: booking.email,
                 customer: booking.customer,
                 service: booking.service,
+                pairs: booking.pairs,
                 date: booking.date,
                 time: booking.time,
                 total: booking.totalDue
-            }).catch(err => console.error('Email send error:', err));
+            });
         }
 
-        // ----- Admin Notification -----
         function sendAdminNotification(booking) {
             sendFormspreeEmail(FORMPREE_ENDPOINTS.adminNotification, {
                 _subject: '📦 New Booking - THE SHOE DOC',
@@ -598,60 +648,14 @@
                 phone: booking.phone,
                 email: booking.email,
                 service: booking.service,
+                pairs: booking.pairs,
                 date: booking.date,
                 time: booking.time,
                 total: booking.totalDue,
                 paymentMethod: booking.paymentMethod
-            }).catch(err => console.error('Email send error:', err));
+            });
         }
 
-        // ----- Payment Confirmed -----
-        function sendPaymentConfirmedEmail(booking) {
-            sendFormspreeEmail(FORMPREE_ENDPOINTS.paymentConfirmed, {
-                _subject: '💰 Payment Confirmed - THE SHOE DOC',
-                to: booking.email,
-                customer: booking.customer,
-                amount: booking.deposit,
-                service: booking.service,
-                date: booking.date,
-                time: booking.time
-            }).catch(err => console.error('Email send error:', err));
-        }
-
-        // ----- Booking Ready for Pickup -----
-        function sendBookingReadyEmail(booking) {
-            sendFormspreeEmail(FORMPREE_ENDPOINTS.bookingReady, {
-                _subject: '📦 Ready for Pickup - THE SHOE DOC',
-                to: booking.email,
-                customer: booking.customer
-            }).catch(err => console.error('Email send error:', err));
-        }
-
-        // ----- Shoes Delivered -----
-        function sendDeliveredEmail(booking) {
-            sendFormspreeEmail(FORMPREE_ENDPOINTS.shoesDelivered, {
-                _subject: '📦 Shoes Delivered - THE SHOE DOC',
-                to: booking.email,
-                customer: booking.customer
-            }).catch(err => console.error('Email send error:', err));
-        }
-
-        // ----- Affiliate Earnings -----
-        function sendAffiliateEarningsEmail(affiliate, customer, amount, type) {
-            const typeLabel = type === 'direct' ? 'Direct Referral' : 'Downline Commission';
-            sendFormspreeEmail(FORMPREE_ENDPOINTS.affiliateEarnings, {
-                _subject: '💰 Affiliate Earnings - THE SHOE DOC',
-                to: affiliate.email,
-                name: affiliate.name,
-                amount: amount,
-                customer: customer,
-                balance: affiliate.balance || 0,
-                affiliate_code: affiliate.affiliate_code,
-                type: typeLabel
-            }).catch(err => console.error('Email send error:', err));
-        }
-
-        // ----- Reward Update -----
         function sendRewardUpdateEmail(booking) {
             const rewards = getCustomerRewards(booking.email);
             sendFormspreeEmail(FORMPREE_ENDPOINTS.rewardUpdate, {
@@ -660,42 +664,7 @@
                 name: booking.customer,
                 points_earned: booking.points_earned || 0,
                 total_points: rewards.points || 0
-            }).catch(err => console.error('Email send error:', err));
-        }
-
-        // ----- Booking Confirmed (Admin action) -----
-        function sendBookingConfirmedEmail(booking) {
-            sendFormspreeEmail(FORMPREE_ENDPOINTS.bookingConfirmed, {
-                _subject: '✅ Booking Confirmed - THE SHOE DOC',
-                to: booking.email,
-                customer: booking.customer,
-                service: booking.service,
-                date: booking.date,
-                time: booking.time
-            }).catch(err => console.error('Email send error:', err));
-        }
-
-        // ----- Service Completed -----
-        function sendBookingCompletedEmail(booking) {
-            sendFormspreeEmail(FORMPREE_ENDPOINTS.serviceCompleted, {
-                _subject: '✔️ Service Completed - THE SHOE DOC',
-                to: booking.email,
-                customer: booking.customer,
-                service: booking.service
-            }).catch(err => console.error('Email send error:', err));
-        }
-
-        // ----- Affiliate Payment -----
-        function sendAffiliatePaymentEmail(affiliate, amount, note) {
-            sendFormspreeEmail(FORMPREE_ENDPOINTS.affiliatePayment, {
-                _subject: '💰 Affiliate Payment - THE SHOE DOC',
-                to: affiliate.email,
-                name: affiliate.name,
-                amount: amount,
-                balance: affiliate.balance || 0,
-                note: note,
-                affiliate_code: affiliate.affiliate_code
-            }).catch(err => console.error('Email send error:', err));
+            });
         }
 
         // ============================================================
@@ -706,6 +675,7 @@
             const phone = document.getElementById('bookPhone').value.trim();
             const email = document.getElementById('bookEmail').value.trim();
             const service = document.getElementById('bookService').value;
+            const pairs = parseInt(document.getElementById('bookPairs').value) || 1;
             const date = document.getElementById('bookDate').value;
             const time = document.getElementById('bookTime').value;
             const notes = document.getElementById('bookNotes').value.trim();
@@ -716,14 +686,16 @@
 
             if (!name || !phone || !date || !time || !email) { alert('Please fill in all required fields.'); return; }
             if (deliveryOpt === 'fetch' && !deliveryAddr) { alert('Please enter your delivery address.'); return; }
+            if (pairs < 1 || pairs > 20) { alert('Please enter a valid number of pairs (1-20).'); return; }
 
             const price = getServicePrice(service);
+            const totalPrice = price * pairs;
             
             // Calculate discount from rewards
             let discount = 0;
             let pointsUsed = 0;
             if (email) {
-                discount = applyRewardDiscount(email, price);
+                discount = applyRewardDiscount(email, totalPrice);
                 if (discount > 0) {
                     const rewards = getCustomerRewards(email);
                     pointsUsed = Math.floor(rewards.points / 10) * 10;
@@ -732,11 +704,11 @@
             }
 
             // Calculate deposit
-            const deposit = Math.max(30, Math.round((price - discount) * 0.5));
+            const deposit = Math.max(30, Math.round((totalPrice - discount) * 0.5));
             const deliveryFee = (deliveryOpt === 'fetch') ? DELIVERY_FEE : 0;
             const totalDue = deposit + deliveryFee;
             const invoiceNum = 'INV-' + Date.now().toString().slice(-8) + '-' + Math.floor(Math.random() * 1000);
-            const pointsEarned = Math.floor(price / 10);
+            const pointsEarned = Math.floor(totalPrice / 10);
 
             const booking = {
                 id: Date.now(),
@@ -745,6 +717,7 @@
                 phone: phone,
                 email: email,
                 service: service,
+                pairs: pairs,
                 date: date,
                 time: time,
                 notes: notes,
@@ -753,6 +726,7 @@
                 deposit: deposit,
                 deliveryFee: deliveryFee,
                 totalDue: totalDue,
+                totalPrice: totalPrice,
                 paymentMethod: paymentMethod,
                 affiliate_code: affiliateCode || null,
                 discount_applied: discount,
@@ -792,11 +766,11 @@
         }
 
         // ============================================================
-        // FORM SUBMISSION - SUCCESS MESSAGE
+        // FORM SUBMISSION
         // ============================================================
         document.getElementById('bookingFormElement').addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent default form submission
-            submitBooking(); // Call our custom function
+            e.preventDefault();
+            submitBooking();
         });
 
         // ============================================================
@@ -813,7 +787,17 @@
                     booking.paid = true;
                     booking.status = 'paid';
                     setData('shoeDocBookings', bookings);
-                    sendPaymentConfirmedEmail(booking);
+                    // Send payment confirmation email
+                    sendFormspreeEmail(FORMPREE_ENDPOINTS.paymentConfirmed, {
+                        _subject: '💰 Payment Confirmed - THE SHOE DOC',
+                        to: booking.email,
+                        customer: booking.customer,
+                        amount: booking.deposit,
+                        service: booking.service,
+                        pairs: booking.pairs,
+                        date: booking.date,
+                        time: booking.time
+                    });
                     alert('✅ Payment successful! Your booking is confirmed. A confirmation email has been sent to you.');
                 }
                 window.history.replaceState({}, document.title, window.location.pathname);
@@ -822,10 +806,7 @@
 
         window.onload = function() { 
             checkPaymentReturn(); 
-        };
-    </script>
-</body>
-</html>
+            updatePrice();
         };
     </script>
 </body>
