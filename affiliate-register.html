@@ -96,9 +96,23 @@
     </div>
 
     <script>
-        function getData(key, fallback) { const data = localStorage.getItem(key); if (data) { try { return JSON.parse(data); } catch(e) { return fallback; } } return fallback; }
-        function setData(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
-        function getAffiliates() { return getData('shoeDocAffiliates', []); }
+        function getData(key, fallback) { 
+            const data = localStorage.getItem(key); 
+            if (data) { 
+                try { return JSON.parse(data); } 
+                catch(e) { return fallback; } 
+            } 
+            return fallback; 
+        }
+        
+        function setData(key, value) { 
+            localStorage.setItem(key, JSON.stringify(value)); 
+        }
+        
+        function getAffiliates() { 
+            return getData('shoeDocAffiliates', []); 
+        }
+        
         function generateAffiliateCode(name) {
             const prefix = name.substring(0, 3).toUpperCase();
             const random = Math.random().toString(36).substring(2, 6).toUpperCase();
@@ -165,23 +179,31 @@
             const bankName = document.getElementById('regBankName').value.trim();
             const accountNumber = document.getElementById('regAccountNumber').value.trim();
 
+            // Validation
             if (!name || !email || !phone || !password || !confirm || !bankName || !accountNumber) {
                 errorEl.textContent = '❌ Please fill in all required fields.';
-                errorEl.classList.add('show'); return;
+                errorEl.classList.add('show'); 
+                return;
             }
             if (password.length < 6) { 
                 errorEl.textContent = '❌ Password must be at least 6 characters.';
-                errorEl.classList.add('show'); return; 
+                errorEl.classList.add('show'); 
+                return; 
             }
             if (password !== confirm) { 
                 errorEl.textContent = '❌ Passwords do not match.';
-                errorEl.classList.add('show'); return; 
+                errorEl.classList.add('show'); 
+                return; 
             }
 
-            const affiliates = getAffiliates();
-            if (affiliates.some(a => a.email.toLowerCase() === email.toLowerCase())) {
+            // Get existing affiliates
+            let affiliates = getAffiliates();
+            
+            // Check if email already exists
+            if (affiliates.some(a => a.email && a.email.toLowerCase() === email.toLowerCase())) {
                 errorEl.textContent = '❌ This email is already registered.';
-                errorEl.classList.add('show'); return;
+                errorEl.classList.add('show'); 
+                return;
             }
 
             // Check referral code
@@ -190,19 +212,21 @@
                 const referrer = affiliates.find(a => a.affiliate_code === referralCode);
                 if (!referrer) { 
                     errorEl.textContent = '❌ Invalid referral code.';
-                    errorEl.classList.add('show'); return; 
+                    errorEl.classList.add('show'); 
+                    return; 
                 }
                 referredBy = referrer.id;
             }
 
             // Generate affiliate code
             const affiliateCode = generateAffiliateCode(name);
+            
             const newAffiliate = {
                 id: Date.now(),
-                name, 
-                email, 
-                phone, 
-                password,
+                name: name,
+                email: email,
+                phone: phone,
+                password: password,
                 affiliate_code: affiliateCode,
                 referred_by: referredBy,
                 bank_name: bankName,
@@ -216,6 +240,7 @@
                 last_login: null
             };
 
+            // Save affiliate
             affiliates.push(newAffiliate);
             setData('shoeDocAffiliates', affiliates);
 
@@ -236,6 +261,7 @@
             analytics.registrations = (analytics.registrations || 0) + 1;
             setData('shoeDocAnalytics', analytics);
 
+            // Show success message
             successEl.textContent = `✅ Registration successful! Your affiliate code is: ${affiliateCode}`;
             successEl.classList.add('show');
 
@@ -249,8 +275,12 @@
             document.getElementById('regBankName').value = '';
             document.getElementById('regAccountNumber').value = '';
 
+            // Save current affiliate and redirect
             localStorage.setItem('currentAffiliate', JSON.stringify(newAffiliate));
-            setTimeout(() => { window.location.href = 'affiliate-dashboard.html'; }, 2500);
+            
+            setTimeout(() => { 
+                window.location.href = 'affiliate-dashboard.html'; 
+            }, 3000);
         }
 
         window.onload = function() {
