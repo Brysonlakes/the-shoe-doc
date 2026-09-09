@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -7,20 +6,16 @@ app.use(cors());
 app.use(express.json());
 
 // =====================================================
-// 🔥 RESEND API CONFIGURATION
+// FORMPREE CONFIGURATION
 // =====================================================
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-console.log('🔑 API Key loaded:', RESEND_API_KEY ? '✅ Yes' : '❌ No');
-const SENDER_EMAIL = 'onboarding@resend.dev';  // Resend's test domain
-const SENDER_NAME = 'THE SHOE DOC';
-// =====================================================
+const FORMPREE_ENDPOINT = 'https://formspree.io/f/mwlkwyjg';
 
 // Health check endpoint
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', service: 'THE SHOE DOC Email Server' });
 });
 
-// Email sending endpoint
+// Email sending endpoint - forwards to Formspree
 app.post('/send-email', async (req, res) => {
     const { to, template, data } = req.body;
     
@@ -159,33 +154,30 @@ app.post('/send-email', async (req, res) => {
 
     try {
         // ============================================================
-        // SEND EMAIL VIA RESEND API
+        // SEND EMAIL VIA FORMPREE
         // ============================================================
-        const response = await fetch('https://api.resend.com/emails', {
+        const formData = new FormData();
+        formData.append('_to', to);
+        formData.append('_subject', templateData.subject);
+        formData.append('_html', templateData.html);
+        // Also send as plain text for Formspree's default email
+        formData.append('message', templateData.html.replace(/<[^>]*>/g, ''));
+
+        const response = await fetch(FORMPREE_ENDPOINT, {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${RESEND_API_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                from: `${SENDER_NAME} <${SENDER_EMAIL}>`,
-                to: [to],
-                subject: templateData.subject,
-                html: templateData.html
-            })
+            body: formData
         });
 
-        const result = await response.json();
-
         if (response.ok) {
-            console.log(`✅ Email sent to ${to} (${template})`);
-            res.json({ success: true, message: result });
+            console.log(`✅ Email sent to ${to} (${template}) via Formspree`);
+            res.json({ success: true, message: 'Email sent via Formspree' });
         } else {
-            console.error('❌ Resend error:', result);
-            res.status(response.status).json({ error: result });
+            const errorText = await response.text();
+            console.error('❌ Formspree error:', response.status, errorText);
+            res.status(response.status).json({ error: 'Formspree error', details: errorText });
         }
     } catch (error) {
-        console.error('❌ Error sending email:', error);
+        console.error('❌ Error sending to Formspree:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -193,6 +185,6 @@ app.post('/send-email', async (req, res) => {
 // Start server
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Email server running on http://localhost:${PORT}`);
-    console.log(`📧 Sending emails via Resend API`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`📧 Emails forwarded to Formspree: ${FORMPREE_ENDPOINT}`);
 });
