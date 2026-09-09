@@ -47,7 +47,6 @@
         .copy-btn { background:transparent; border:1px solid #333; color:#aaa; padding:4px 14px; border-radius:30px; cursor:pointer; font-size:0.7rem; transition:0.3s; }
         .copy-btn:hover { border-color:var(--gold); color:var(--gold); }
         .commission-badge { background:rgba(212,175,55,0.15); color:var(--gold); padding:2px 12px; border-radius:30px; font-size:0.7rem; font-weight:600; }
-        .total-pairs { color:#888; font-size:0.8rem; }
         @media (max-width:480px) { .header h1 { font-size:1.2rem; } .stats-grid { grid-template-columns:1fr 1fr; } .panel { padding:20px 16px; } }
     </style>
 </head>
@@ -72,7 +71,7 @@
             <h3>🔗 Your Affiliate Code</h3>
             <div class="affiliate-code-box">
                 <div class="code" id="affiliateCode">------</div>
-                <p>Share this code with customers. You earn <strong>R20 per pair</strong> they book!</p>
+                <p>Share this code with customers. You earn R20 per pair they book!</p>
                 <button class="copy-btn" onclick="copyCode()">📋 Copy Code</button>
             </div>
             <div style="text-align:center; color:#888; font-size:0.85rem;">
@@ -104,32 +103,48 @@
         function logout() { localStorage.removeItem('currentAffiliate'); localStorage.removeItem('rememberedUser'); }
 
         function loadDashboard() {
+            // Check if user is logged in
             const affiliateData = localStorage.getItem('currentAffiliate');
-            if (!affiliateData) { window.location.href = 'affiliate-register.html'; return; }
+            if (!affiliateData) { 
+                window.location.href = 'affiliate-register.html'; 
+                return; 
+            }
+            
             const currentAffiliate = JSON.parse(affiliateData);
             const affiliates = getAffiliates();
             const bookings = getBookings();
-            const affiliate = affiliates.find(a => a.id === currentAffiliate.id);
-            if (!affiliate) { window.location.href = 'affiliate-register.html'; return; }
-
-            // Calculate total earnings from all referrals
-            const referralBookings = bookings.filter(b => b.affiliate_code === affiliate.affiliate_code);
-            const totalEarnings = referralBookings.reduce((sum, b) => sum + 20, 0);
             
+            // Find the affiliate in the list
+            const affiliate = affiliates.find(a => a.id === currentAffiliate.id);
+            if (!affiliate) { 
+                // If not found, try to find by email
+                const affiliateByEmail = affiliates.find(a => a.email === currentAffiliate.email);
+                if (!affiliateByEmail) {
+                    window.location.href = 'affiliate-register.html'; 
+                    return;
+                }
+                localStorage.setItem('currentAffiliate', JSON.stringify(affiliateByEmail));
+                affiliate = affiliateByEmail;
+            }
+
+            // Update stats
             document.getElementById('totalEarnings').textContent = 'R' + (affiliate.total_earned || 0);
             document.getElementById('totalReferrals').textContent = (affiliate.referrals || []).length;
             document.getElementById('downlineCount').textContent = (affiliate.downline || []).length;
             document.getElementById('pendingPayout').textContent = 'R' + (affiliate.balance || 0);
             document.getElementById('affiliateCode').textContent = affiliate.affiliate_code;
 
+            // Bank details
             document.getElementById('bankDetails').innerHTML = `
                 <p><strong>Bank:</strong> ${affiliate.bank_name || 'Not set'}</p>
                 <p><strong>Account Number:</strong> ${affiliate.account_number || 'Not set'}</p>
                 <p style="color:#666; font-size:0.8rem; margin-top:8px;">Update your bank details in the affiliate registration page.</p>
             `;
 
-            // Referrals with pair count
+            // Referral bookings
+            const referralBookings = bookings.filter(b => b.affiliate_code === affiliate.affiliate_code);
             const referralsContainer = document.getElementById('referralsList');
+            
             if (referralBookings.length === 0) {
                 referralsContainer.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>No referrals yet. Share your code!</p></div>`;
             } else {
@@ -137,10 +152,10 @@
                 referralBookings.forEach(b => { 
                     html += `<tr>
                         <td><strong>${b.customer}</strong></td>
-                        <td>${b.service}</td>
-                        <td><span class="commission-badge">${b.pairs || 1} pair${(b.pairs || 1) > 1 ? 's' : ''}</span></td>
+                        <td>${b.servicesList || b.service || 'N/A'}</td>
+                        <td><span class="commission-badge">${b.totalPairs || b.pairs || 1} pair${(b.totalPairs || b.pairs || 1) > 1 ? 's' : ''}</span></td>
                         <td>${b.date}</td>
-                        <td><strong style="color:var(--gold);">R${(b.pairs || 1) * 20}</strong></td>
+                        <td><strong style="color:var(--gold);">R${(b.totalPairs || b.pairs || 1) * 20}</strong></td>
                     </tr>`; 
                 });
                 html += `</tbody></table></div>`;
@@ -150,6 +165,7 @@
             // Downline affiliates
             const downlineContainer = document.getElementById('downlineList');
             const downline = affiliate.downline || [];
+            
             if (downline.length === 0) {
                 downlineContainer.innerHTML = `<div class="empty-state"><div class="icon">👤</div><p>No downline affiliates yet. Recruit others!</p></div>`;
             } else {
@@ -161,6 +177,8 @@
                 html += `</tbody></table></div>`;
                 downlineContainer.innerHTML = html;
             }
+            
+            // Update localStorage with latest affiliate data
             localStorage.setItem('currentAffiliate', JSON.stringify(affiliate));
         }
 
@@ -168,6 +186,7 @@
             const code = document.getElementById('affiliateCode').textContent;
             navigator.clipboard.writeText(code).then(() => { alert('✅ Affiliate code copied: ' + code); });
         }
+        
         window.onload = loadDashboard;
     </script>
 </body>
