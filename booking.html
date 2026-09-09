@@ -549,36 +549,15 @@
         }
 
         // ============================================================
-        // AFFILIATE EARNINGS - Now uses Formspree
-        // ============================================================
-        function sendAffiliateEarningsEmail(affiliate, customer, amount, type) {
-            const typeLabel = type === 'direct' ? 'Direct Referral' : 'Downline Commission';
-            const formData = new FormData();
-            formData.append('_subject', 'Affiliate Earnings - THE SHOE DOC');
-            formData.append('_to', affiliate.email);
-            formData.append('name', affiliate.name);
-            formData.append('amount', amount);
-            formData.append('customer', customer);
-            formData.append('balance', affiliate.balance || 0);
-            formData.append('affiliate_code', affiliate.affiliate_code);
-            formData.append('type', typeLabel);
-            
-            fetch('https://formspree.io/f/mwlkwyjg', {
-                method: 'POST',
-                body: formData
-            }).catch(err => console.error('Email send error:', err));
-        }
-
-        // ============================================================
-        // FORM SUBMISSION
+        // FORM SUBMISSION - SUCCESS MESSAGE
         // ============================================================
         document.getElementById('bookingFormElement').addEventListener('submit', function(e) {
             // Let Formspree handle the submission
-            // We'll show success message after submission
+            // Show success message after a short delay
             setTimeout(() => {
                 document.getElementById('bookingForm').style.display = 'none';
                 document.getElementById('successMessage').style.display = 'block';
-            }, 100);
+            }, 500);
         });
 
         // ============================================================
