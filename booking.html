@@ -115,7 +115,7 @@
         .footer__bottom a:hover { color:var(--gold); }
         .modal-overlay { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(5px); z-index:1000; justify-content:center; align-items:center; padding:20px; }
         .modal-overlay.active { display:flex; }
-        .modal { background:var(--dark-card); max-width:600px; width:100%; border-radius:24px; padding:40px 32px; border:1px solid rgba(212,175,55,0.2); box-shadow:0 20px 60px rgba(0,0,0,0.9); position:relative; max-height:95vh; overflow-y:auto; }
+        .modal { background:var(--dark-card); max-width:650px; width:100%; border-radius:24px; padding:40px 32px; border:1px solid rgba(212,175,55,0.2); box-shadow:0 20px 60px rgba(0,0,0,0.9); position:relative; max-height:95vh; overflow-y:auto; }
         .modal-close { position:absolute; top:16px; right:20px; background:none; border:none; color:#888; font-size:1.8rem; cursor:pointer; transition:var(--transition); }
         .modal-close:hover { color:var(--white); }
         .modal h2 { font-family:var(--font-serif); font-size:1.8rem; color:var(--white); margin-bottom:4px; }
@@ -142,10 +142,18 @@
         .success-message h3 { color:#28a745; margin-bottom:8px; }
         .price-calculator { background:rgba(212,175,55,0.05); border:1px solid rgba(212,175,55,0.15); border-radius:12px; padding:16px; margin-bottom:16px; }
         .price-calculator .total-price { font-size:1.5rem; font-weight:700; color:var(--gold); text-align:center; }
+        .service-row { display:flex; gap:12px; align-items:center; margin-bottom:8px; flex-wrap:wrap; background:rgba(255,255,255,0.02); padding:8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); }
+        .service-row select { flex:2; min-width:150px; }
+        .service-row input[type="number"] { flex:1; min-width:60px; max-width:100px; padding:8px 12px; border-radius:8px; border:1px solid #2a2a2a; background:#0f0f0f; color:#fff; font-size:1rem; }
+        .service-row .price-tag { color:var(--gold); font-weight:600; min-width:60px; font-size:0.9rem; }
+        .add-service-btn { background:transparent; border:1px dashed #333; color:#888; padding:8px 16px; border-radius:30px; cursor:pointer; transition:0.3s; font-size:0.85rem; width:100%; margin-top:4px; }
+        .add-service-btn:hover { border-color:var(--gold); color:var(--gold); }
+        .remove-service-btn { background:transparent; border:none; color:#ff4d4d; cursor:pointer; font-size:1.2rem; padding:0 4px; }
+        .remove-service-btn:hover { color:#ff6b6b; }
         @media (min-width:640px) { .gallery__grid { grid-template-columns:repeat(3,1fr); } .gallery__item:nth-child(1) { grid-column:span 2; } .gallery__item:nth-child(4) { grid-column:span 2; } }
         @media (min-width:768px) { .services__grid { grid-template-columns:1fr 1fr; } .affiliates__grid { grid-template-columns:3fr 2fr; align-items:center; } .footer__links { grid-template-columns:repeat(3,1fr); } }
         @media (min-width:1024px) { .services__grid { grid-template-columns:repeat(4,1fr); } .affiliates__breakdown ul { grid-template-columns:1fr; } }
-        @media (max-width:480px) { .hero__top { flex-direction:column; gap:8px; align-items:flex-start; } .btn--large { padding:14px 28px; font-size:1rem; width:100%; justify-content:center; } .service-card { padding:24px 16px; } .affiliates__grid { padding:24px 16px; } .footer__links { grid-template-columns:1fr; } .modal { padding:24px 16px; } .invoice-actions { flex-direction:column; } }
+        @media (max-width:480px) { .hero__top { flex-direction:column; gap:8px; align-items:flex-start; } .btn--large { padding:14px 28px; font-size:1rem; width:100%; justify-content:center; } .service-card { padding:24px 16px; } .affiliates__grid { padding:24px 16px; } .footer__links { grid-template-columns:1fr; } .modal { padding:24px 16px; } .invoice-actions { flex-direction:column; } .service-row { flex-wrap:wrap; } .service-row input[type="number"] { max-width:100%; } }
         .btn svg { width:22px; height:22px; flex-shrink:0; }
     </style>
 </head>
@@ -294,7 +302,7 @@
             <!-- Booking Form -->
             <div id="bookingForm">
                 <h2>📅 Book Your Cleaning</h2>
-                <p class="sub">Fill in your details. A deposit (50%) is required to confirm.</p>
+                <p class="sub">Add different services with quantities. Mix and match!</p>
                 
                 <!-- Points Display -->
                 <div id="pointsDisplay" style="background:rgba(212,175,55,0.08);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid rgba(212,175,55,0.15);">
@@ -323,32 +331,35 @@
                         <input type="email" name="email" id="bookEmail" placeholder="customer@email.com" required onchange="checkCustomerPoints()" />
                     </div>
                     
-                    <!-- ===== NEW: NUMBER OF PAIRS ===== -->
+                    <!-- ===== SERVICE SELECTOR ===== -->
                     <div class="form-group">
-                        <label>Number of Pairs *</label>
-                        <input type="number" name="pairs" id="bookPairs" value="1" min="1" max="20" required onchange="updatePrice()" />
-                        <small style="color:#666; font-size:0.75rem;">Max 20 pairs per booking</small>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Service *</label>
-                        <select name="service" id="bookService" onchange="updatePrice()">
-                            <option value="Basic Wash">Basic Wash (R60/pair)</option>
-                            <option value="Deep Clean">Deep Clean (R100/pair)</option>
-                            <option value="Premium Care">Premium Care (R150/pair)</option>
-                            <option value="Sole Whitening">Sole Whitening (R120/pair)</option>
-                        </select>
+                        <label>Services & Quantities *</label>
+                        <div id="servicesContainer">
+                            <div class="service-row" data-index="0">
+                                <select name="service_0" class="service-select">
+                                    <option value="Basic Wash">🧼 Basic Wash (R60)</option>
+                                    <option value="Deep Clean">✨ Deep Clean (R100)</option>
+                                    <option value="Premium Care">👑 Premium Care (R150)</option>
+                                    <option value="Sole Whitening">⚪ Sole Whitening (R120)</option>
+                                </select>
+                                <input type="number" name="quantity_0" class="service-quantity" value="1" min="1" max="20" onchange="updatePrice()" />
+                                <span class="price-tag" id="price_0">R60</span>
+                                <button type="button" class="remove-service-btn" onclick="removeServiceRow(this)" title="Remove this service">✕</button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-service-btn" onclick="addServiceRow()">➕ Add Another Service</button>
+                        <small style="color:#666; font-size:0.75rem; display:block; margin-top:4px;">Each row = one service type. Add multiple rows for different services.</small>
                     </div>
                     
                     <!-- Price Calculator -->
                     <div class="price-calculator">
                         <div style="display:flex; justify-content:space-between; padding:4px 0;">
-                            <span>Price per pair:</span>
-                            <span id="pricePerPair">R60</span>
+                            <span>Total Pairs:</span>
+                            <span id="totalPairsDisplay">1</span>
                         </div>
                         <div style="display:flex; justify-content:space-between; padding:4px 0;">
-                            <span>Number of pairs:</span>
-                            <span id="displayPairs">1</span>
+                            <span>Subtotal:</span>
+                            <span id="subtotalDisplay">R60</span>
                         </div>
                         <div style="display:flex; justify-content:space-between; padding:8px 0; border-top:1px solid rgba(255,255,255,0.1); margin-top:4px;">
                             <span style="font-weight:600;">Total Price:</span>
@@ -424,6 +435,7 @@
             'https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&h=400&fit=crop&crop=center'
         ];
         const DELIVERY_FEE = 40;
+        let serviceCounter = 1;
 
         function getData(key, fallback) { const data = localStorage.getItem(key); if (data) { try { return JSON.parse(data); } catch(e) { return fallback; } } return fallback; }
         function setData(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
@@ -451,7 +463,7 @@
                     <h3 class="service-card__title">${s.title}</h3>
                     <p class="service-card__desc">${s.desc}</p>
                     <div class="service-card__price">${price}</div>
-                    <button class="btn btn--outline-gold" onclick="openBookingModal('${s.title}')">Book Now</button>
+                    <button class="btn btn--outline-gold" onclick="openBookingModal()">Book Now</button>
                 `;
                 grid.appendChild(card);
             });
@@ -477,28 +489,76 @@
         renderGallery();
 
         // ============================================================
+        // SERVICE ROW MANAGEMENT
+        // ============================================================
+        function addServiceRow() {
+            const container = document.getElementById('servicesContainer');
+            const index = serviceCounter;
+            const row = document.createElement('div');
+            row.className = 'service-row';
+            row.dataset.index = index;
+            row.innerHTML = `
+                <select name="service_${index}" class="service-select" onchange="updatePrice()">
+                    <option value="Basic Wash">🧼 Basic Wash (R60)</option>
+                    <option value="Deep Clean">✨ Deep Clean (R100)</option>
+                    <option value="Premium Care">👑 Premium Care (R150)</option>
+                    <option value="Sole Whitening">⚪ Sole Whitening (R120)</option>
+                </select>
+                <input type="number" name="quantity_${index}" class="service-quantity" value="1" min="1" max="20" onchange="updatePrice()" />
+                <span class="price-tag" id="price_${index}">R60</span>
+                <button type="button" class="remove-service-btn" onclick="removeServiceRow(this)" title="Remove this service">✕</button>
+            `;
+            container.appendChild(row);
+            serviceCounter++;
+            updatePrice();
+        }
+
+        function removeServiceRow(button) {
+            const rows = document.querySelectorAll('.service-row');
+            if (rows.length <= 1) {
+                alert('You need at least one service.');
+                return;
+            }
+            button.closest('.service-row').remove();
+            updatePrice();
+        }
+
+        // ============================================================
         // PRICE CALCULATOR
         // ============================================================
         function updatePrice() {
-            const service = document.getElementById('bookService').value;
-            const pairs = parseInt(document.getElementById('bookPairs').value) || 1;
-            const deliveryOpt = document.getElementById('deliveryOption').value;
-            
+            const rows = document.querySelectorAll('.service-row');
+            let totalPairs = 0;
+            let subtotal = 0;
             const priceMap = {
                 'Basic Wash': parseInt(prices.basic.replace('R', '')) || 60,
                 'Deep Clean': parseInt(prices.deep.replace('R', '')) || 100,
                 'Premium Care': parseInt(prices.premium.replace('R', '')) || 150,
                 'Sole Whitening': parseInt(prices.sole.replace('R', '')) || 120
             };
-            
-            const pricePerPair = priceMap[service] || 60;
-            const totalPrice = pricePerPair * pairs;
+
+            rows.forEach((row, idx) => {
+                const select = row.querySelector('.service-select');
+                const quantity = parseInt(row.querySelector('.service-quantity').value) || 1;
+                const service = select.value;
+                const pricePerPair = priceMap[service] || 60;
+                const totalPrice = pricePerPair * quantity;
+                subtotal += totalPrice;
+                totalPairs += quantity;
+                const priceTag = row.querySelector('.price-tag');
+                if (priceTag) {
+                    priceTag.textContent = 'R' + totalPrice;
+                }
+            });
+
+            const deliveryOpt = document.getElementById('deliveryOption').value;
             const deliveryFee = deliveryOpt === 'fetch' ? DELIVERY_FEE : 0;
-            const deposit = Math.max(30, Math.round(totalPrice * 0.5));
-            
-            document.getElementById('pricePerPair').textContent = 'R' + pricePerPair;
-            document.getElementById('displayPairs').textContent = pairs;
-            document.getElementById('totalPriceDisplay').textContent = 'R' + (totalPrice + deliveryFee);
+            const total = subtotal + deliveryFee;
+            const deposit = Math.max(30, Math.round(total * 0.5));
+
+            document.getElementById('totalPairsDisplay').textContent = totalPairs;
+            document.getElementById('subtotalDisplay').textContent = 'R' + subtotal;
+            document.getElementById('totalPriceDisplay').textContent = 'R' + total;
             document.getElementById('depositDisplay').textContent = 'R' + deposit;
         }
 
@@ -555,9 +615,21 @@
             document.body.style.overflow = 'hidden';
             document.getElementById('bookingForm').style.display = 'block';
             document.getElementById('successMessage').style.display = 'none';
+            
+            // Reset to one service row
+            const container = document.getElementById('servicesContainer');
+            container.innerHTML = '';
+            serviceCounter = 0;
+            addServiceRow();
+            
             if (serviceName) {
-                const select = document.getElementById('bookService');
-                for (let opt of select.options) { if (opt.value === serviceName) { opt.selected = true; break; } }
+                const select = container.querySelector('.service-select');
+                for (let opt of select.options) { 
+                    if (opt.value === serviceName) { 
+                        opt.selected = true; 
+                        break; 
+                    } 
+                }
             }
             const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
             document.getElementById('bookDate').value = tomorrow.toISOString().split('T')[0];
@@ -568,7 +640,6 @@
             document.getElementById('bookNotes').value = '';
             document.getElementById('deliveryAddress').value = '';
             document.getElementById('affiliateCode').value = '';
-            document.getElementById('bookPairs').value = 1;
             document.getElementById('addressGroup').classList.add('hidden-field');
             document.getElementById('rewardDiscountDisplay').style.display = 'none';
             document.getElementById('customerPoints').textContent = '0';
@@ -596,7 +667,21 @@
                 'Premium Care': parseInt(prices.premium.replace('R', '')) || 150,
                 'Sole Whitening': parseInt(prices.sole.replace('R', '')) || 120
             };
-            return map[serviceName] || 0;
+            return map[serviceName] || 60;
+        }
+
+        function getBookingServices() {
+            const rows = document.querySelectorAll('.service-row');
+            const services = [];
+            rows.forEach(row => {
+                const select = row.querySelector('.service-select');
+                const quantity = parseInt(row.querySelector('.service-quantity').value) || 1;
+                services.push({
+                    service: select.value,
+                    quantity: quantity
+                });
+            });
+            return services;
         }
 
         // ============================================================
@@ -620,11 +705,7 @@
             Object.keys(data).forEach(key => {
                 formData.append(key, data[key]);
             });
-            
-            return fetch(endpoint, {
-                method: 'POST',
-                body: formData
-            }).catch(err => console.error('Email send error:', err));
+            return fetch(endpoint, { method: 'POST', body: formData }).catch(err => console.error('Email send error:', err));
         }
 
         function sendCustomerConfirmation(booking) {
@@ -632,8 +713,8 @@
                 _subject: '✅ Booking Confirmed - THE SHOE DOC',
                 to: booking.email,
                 customer: booking.customer,
-                service: booking.service,
-                pairs: booking.pairs,
+                services: booking.servicesList,
+                totalPairs: booking.totalPairs,
                 date: booking.date,
                 time: booking.time,
                 total: booking.totalDue
@@ -647,8 +728,8 @@
                 customer: booking.customer,
                 phone: booking.phone,
                 email: booking.email,
-                service: booking.service,
-                pairs: booking.pairs,
+                services: booking.servicesList,
+                totalPairs: booking.totalPairs,
                 date: booking.date,
                 time: booking.time,
                 total: booking.totalDue,
@@ -674,8 +755,6 @@
             const name = document.getElementById('bookName').value.trim();
             const phone = document.getElementById('bookPhone').value.trim();
             const email = document.getElementById('bookEmail').value.trim();
-            const service = document.getElementById('bookService').value;
-            const pairs = parseInt(document.getElementById('bookPairs').value) || 1;
             const date = document.getElementById('bookDate').value;
             const time = document.getElementById('bookTime').value;
             const notes = document.getElementById('bookNotes').value.trim();
@@ -686,16 +765,34 @@
 
             if (!name || !phone || !date || !time || !email) { alert('Please fill in all required fields.'); return; }
             if (deliveryOpt === 'fetch' && !deliveryAddr) { alert('Please enter your delivery address.'); return; }
-            if (pairs < 1 || pairs > 20) { alert('Please enter a valid number of pairs (1-20).'); return; }
 
-            const price = getServicePrice(service);
-            const totalPrice = price * pairs;
-            
+            // Get all services
+            const serviceRows = document.querySelectorAll('.service-row');
+            let servicesList = [];
+            let totalPairs = 0;
+            let subtotal = 0;
+            const priceMap = {
+                'Basic Wash': parseInt(prices.basic.replace('R', '')) || 60,
+                'Deep Clean': parseInt(prices.deep.replace('R', '')) || 100,
+                'Premium Care': parseInt(prices.premium.replace('R', '')) || 150,
+                'Sole Whitening': parseInt(prices.sole.replace('R', '')) || 120
+            };
+
+            serviceRows.forEach(row => {
+                const select = row.querySelector('.service-select');
+                const quantity = parseInt(row.querySelector('.service-quantity').value) || 1;
+                const service = select.value;
+                const pricePerPair = priceMap[service] || 60;
+                servicesList.push({ service, quantity, pricePerPair });
+                totalPairs += quantity;
+                subtotal += pricePerPair * quantity;
+            });
+
             // Calculate discount from rewards
             let discount = 0;
             let pointsUsed = 0;
             if (email) {
-                discount = applyRewardDiscount(email, totalPrice);
+                discount = applyRewardDiscount(email, subtotal);
                 if (discount > 0) {
                     const rewards = getCustomerRewards(email);
                     pointsUsed = Math.floor(rewards.points / 10) * 10;
@@ -703,12 +800,14 @@
                 }
             }
 
-            // Calculate deposit
-            const deposit = Math.max(30, Math.round((totalPrice - discount) * 0.5));
             const deliveryFee = (deliveryOpt === 'fetch') ? DELIVERY_FEE : 0;
-            const totalDue = deposit + deliveryFee;
+            const totalAfterDiscount = subtotal - discount + deliveryFee;
+            const deposit = Math.max(30, Math.round(totalAfterDiscount * 0.5));
             const invoiceNum = 'INV-' + Date.now().toString().slice(-8) + '-' + Math.floor(Math.random() * 1000);
-            const pointsEarned = Math.floor(totalPrice / 10);
+            const pointsEarned = Math.floor(subtotal / 10);
+
+            // Format services for display
+            const servicesDisplay = servicesList.map(s => `${s.service} (${s.quantity} pair${s.quantity > 1 ? 's' : ''})`).join(', ');
 
             const booking = {
                 id: Date.now(),
@@ -716,8 +815,9 @@
                 customer: name,
                 phone: phone,
                 email: email,
-                service: service,
-                pairs: pairs,
+                servicesList: servicesDisplay,
+                totalPairs: totalPairs,
+                subtotal: subtotal,
                 date: date,
                 time: time,
                 notes: notes,
@@ -725,8 +825,7 @@
                 deliveryAddress: deliveryAddr || 'N/A',
                 deposit: deposit,
                 deliveryFee: deliveryFee,
-                totalDue: totalDue,
-                totalPrice: totalPrice,
+                totalDue: deposit + deliveryFee,
                 paymentMethod: paymentMethod,
                 affiliate_code: affiliateCode || null,
                 discount_applied: discount,
@@ -760,7 +859,6 @@
                 alert('✅ Booking confirmed! A confirmation email has been sent to you.');
             }
 
-            // Show success message
             document.getElementById('bookingForm').style.display = 'none';
             document.getElementById('successMessage').style.display = 'block';
         }
@@ -787,14 +885,12 @@
                     booking.paid = true;
                     booking.status = 'paid';
                     setData('shoeDocBookings', bookings);
-                    // Send payment confirmation email
                     sendFormspreeEmail(FORMPREE_ENDPOINTS.paymentConfirmed, {
                         _subject: '💰 Payment Confirmed - THE SHOE DOC',
                         to: booking.email,
                         customer: booking.customer,
                         amount: booking.deposit,
-                        service: booking.service,
-                        pairs: booking.pairs,
+                        services: booking.servicesList,
                         date: booking.date,
                         time: booking.time
                     });
@@ -806,7 +902,6 @@
 
         window.onload = function() { 
             checkPaymentReturn(); 
-            updatePrice();
         };
     </script>
 </body>
