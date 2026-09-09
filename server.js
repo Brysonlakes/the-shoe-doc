@@ -9,8 +9,8 @@ app.use(express.json());
 // =====================================================
 // 🔥 SUPABASE CONFIGURATION
 // =====================================================
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';  // From Settings → API
-const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';  // From Settings → API
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';  // ← REPLACE THIS
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';  // ← REPLACE THIS
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Health check
