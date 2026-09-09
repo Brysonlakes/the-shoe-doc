@@ -273,14 +273,14 @@
         <div id="tabEmail" class="tab-content">
             <div class="admin-panel">
                 <h3>📧 Email Settings</h3>
-                <p style="color:#888; margin-bottom:16px;">SMTP server is used for all emails. Make sure the server is running!</p>
+                <p style="color:#888; margin-bottom:16px;">Emails are sent via Formspree. No server needed!</p>
                 <div class="email-config">
-                    <label>SMTP Server URL</label>
-                    <input type="text" id="smtpServerUrl" value="https://shoe-doc-email-server.onrender.com" />
-                    <button class="save-btn secondary" onclick="testServerConnection()">🔌 Test Connection</button>
-                    <div id="serverStatus" class="msg" style="margin-top:8px;"></div>
+                    <label>Email Status</label>
+                    <div style="color:#28a745; padding:8px; background:rgba(40,167,69,0.1); border-radius:8px;">
+                        ✅ Formspree is active. All emails will be sent through Formspree.
+                    </div>
                 </div>
-                <div class="note">✅ Server must be running: <code>node server.js</code> in the shoe-doc-email-server folder.</div>
+                <div class="note">📧 Emails are handled by Formspree. Check your Formspree dashboard for submission logs.</div>
             </div>
         </div>
 
@@ -340,6 +340,96 @@
         function getBookings() { return getData('shoeDocBookings', []); }
         function getCustomers() { return getData('shoeDocCustomers', []); }
         function getAnalytics() { return getData('shoeDocAnalytics', { visitors: 0, registrations: 0, bookings: 0 }); }
+
+        // ============================================================
+        // FORMPREE EMAIL FUNCTIONS
+        // ============================================================
+        const FORMPREE_ENDPOINTS = {
+            paymentConfirmed: 'https://formspree.io/f/mrpgodzz',
+            bookingConfirmed: 'https://formspree.io/f/xyeybvgd',
+            bookingCompleted: 'https://formspree.io/f/xzebkwpj',
+            bookingReady: 'https://formspree.io/f/xbgjpbrj',
+            shoesDelivered: 'https://formspree.io/f/mnpqoran',
+            affiliatePayment: 'https://formspree.io/f/xeaqpdjp'
+        };
+
+        function sendFormspreeEmail(endpoint, data) {
+            const formData = new FormData();
+            Object.keys(data).forEach(key => {
+                formData.append(key, data[key]);
+            });
+            
+            return fetch(endpoint, {
+                method: 'POST',
+                body: formData
+            }).catch(err => console.error('Email send error:', err));
+        }
+
+        // ----- Payment Confirmed -----
+        function sendPaymentConfirmedEmail(booking) {
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.paymentConfirmed, {
+                _subject: '💰 Payment Confirmed - THE SHOE DOC',
+                to: booking.email,
+                customer: booking.customer,
+                amount: booking.deposit || booking.totalDue || 0,
+                service: booking.service,
+                date: booking.date,
+                time: booking.time
+            });
+        }
+
+        // ----- Booking Confirmed (Admin action) -----
+        function sendBookingConfirmedEmail(booking) {
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.bookingConfirmed, {
+                _subject: '✅ Booking Confirmed - THE SHOE DOC',
+                to: booking.email,
+                customer: booking.customer,
+                service: booking.service,
+                date: booking.date,
+                time: booking.time
+            });
+        }
+
+        // ----- Service Completed -----
+        function sendBookingCompletedEmail(booking) {
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.bookingCompleted, {
+                _subject: '✔️ Service Completed - THE SHOE DOC',
+                to: booking.email,
+                customer: booking.customer,
+                service: booking.service
+            });
+        }
+
+        // ----- Booking Ready for Pickup -----
+        function sendBookingReadyEmail(booking) {
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.bookingReady, {
+                _subject: '📦 Ready for Pickup - THE SHOE DOC',
+                to: booking.email,
+                customer: booking.customer
+            });
+        }
+
+        // ----- Shoes Delivered -----
+        function sendDeliveredEmail(booking) {
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.shoesDelivered, {
+                _subject: '📦 Shoes Delivered - THE SHOE DOC',
+                to: booking.email,
+                customer: booking.customer
+            });
+        }
+
+        // ----- Affiliate Payment -----
+        function sendAffiliatePaymentEmail(affiliate, amount, note) {
+            sendFormspreeEmail(FORMPREE_ENDPOINTS.affiliatePayment, {
+                _subject: '💰 Affiliate Payment - THE SHOE DOC',
+                to: affiliate.email,
+                name: affiliate.name,
+                amount: amount,
+                balance: affiliate.balance || 0,
+                note: note,
+                affiliate_code: affiliate.affiliate_code
+            });
+        }
 
         // ============================================================
         // LOGIN
@@ -465,108 +555,6 @@
         }
 
         // ============================================================
-        // EMAIL FUNCTIONS FOR BOOKINGS
-        // ============================================================
-        function sendPaymentConfirmedEmail(id) {
-            const bookings = getData('shoeDocBookings', []);
-            const b = bookings.find(bk => bk.id === id);
-            if (!b) return;
-            const serverUrl = document.getElementById('smtpServerUrl').value.trim();
-            fetch(serverUrl + '/send-email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    to: b.email,
-                    template: 'payment_confirmed',
-                    data: {
-                        customer: b.customer,
-                        amount: b.deposit || b.totalDue || 0,
-                        service: b.service,
-                        date: b.date,
-                        time: b.time
-                    }
-                })
-            }).then(() => console.log('✅ Payment confirmation email sent'))
-              .catch(err => console.error('❌ Email send error:', err));
-        }
-
-        function sendBookingConfirmedEmail(id) {
-            const bookings = getData('shoeDocBookings', []);
-            const b = bookings.find(bk => bk.id === id);
-            if (!b) return;
-            const serverUrl = document.getElementById('smtpServerUrl').value.trim();
-            fetch(serverUrl + '/send-email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    to: b.email,
-                    template: 'booking_confirmed',
-                    data: {
-                        customer: b.customer,
-                        service: b.service,
-                        date: b.date,
-                        time: b.time
-                    }
-                })
-            }).then(() => console.log('✅ Booking confirmation email sent'))
-              .catch(err => console.error('❌ Email send error:', err));
-        }
-
-        function sendBookingCompletedEmail(id) {
-            const bookings = getData('shoeDocBookings', []);
-            const b = bookings.find(bk => bk.id === id);
-            if (!b) return;
-            const serverUrl = document.getElementById('smtpServerUrl').value.trim();
-            fetch(serverUrl + '/send-email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    to: b.email,
-                    template: 'booking_completed',
-                    data: {
-                        customer: b.customer,
-                        service: b.service
-                    }
-                })
-            }).then(() => console.log('✅ Completion email sent'))
-              .catch(err => console.error('❌ Email send error:', err));
-        }
-
-        function sendBookingReadyEmail(id) {
-            const bookings = getData('shoeDocBookings', []);
-            const b = bookings.find(bk => bk.id === id);
-            if (!b) return;
-            const serverUrl = document.getElementById('smtpServerUrl').value.trim();
-            fetch(serverUrl + '/send-email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    to: b.email,
-                    template: 'booking_ready',
-                    data: { customer: b.customer }
-                })
-            }).then(() => console.log('✅ Ready email sent'))
-              .catch(err => console.error('❌ Email send error:', err));
-        }
-
-        function sendDeliveredEmail(id) {
-            const bookings = getData('shoeDocBookings', []);
-            const b = bookings.find(bk => bk.id === id);
-            if (!b) return;
-            const serverUrl = document.getElementById('smtpServerUrl').value.trim();
-            fetch(serverUrl + '/send-email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    to: b.email,
-                    template: 'shoe_delivered',
-                    data: { customer: b.customer }
-                })
-            }).then(() => console.log('✅ Delivered email sent'))
-              .catch(err => console.error('❌ Email send error:', err));
-        }
-
-        // ============================================================
         // BOOKING ACTION FUNCTIONS
         // ============================================================
         function togglePaidAndSendEmail(id) {
@@ -580,7 +568,7 @@
                 setData('shoeDocBookings', bookings);
                 renderBookings();
                 if (b.paid) {
-                    sendPaymentConfirmedEmail(id);
+                    sendPaymentConfirmedEmail(b);
                     alert('✅ Payment toggled and confirmation email sent!');
                 } else {
                     alert('✅ Payment toggled to unpaid.');
@@ -598,10 +586,10 @@
                 renderBookings();
                 
                 if (newStatus === 'confirmed' && oldStatus !== 'confirmed') {
-                    sendBookingConfirmedEmail(id);
+                    sendBookingConfirmedEmail(b);
                     alert('✅ Booking confirmed and email sent!');
                 } else if (newStatus === 'completed' && oldStatus !== 'completed') {
-                    sendBookingCompletedEmail(id);
+                    sendBookingCompletedEmail(b);
                     alert('✅ Service completed and email sent!');
                 } else {
                     alert(`✅ Status updated to ${newStatus}`);
@@ -618,7 +606,7 @@
                 b.status = 'paid';
                 setData('shoeDocBookings', bookings);
                 renderBookings();
-                sendPaymentConfirmedEmail(id);
+                sendPaymentConfirmedEmail(b);
                 alert('✅ Marked as paid and email sent!');
             }
         }
@@ -746,7 +734,6 @@
 
             const amount = parseFloat(document.getElementById('payAmount').value);
             const note = document.getElementById('payNote').value.trim() || 'Affiliate commission payment';
-            const serverUrl = document.getElementById('smtpServerUrl').value.trim();
 
             if (!amount || amount <= 0) {
                 errorEl.textContent = '❌ Please enter a valid amount.';
@@ -777,21 +764,8 @@
             });
             setData('shoeDocAffiliates', affiliates);
 
-            fetch(serverUrl + '/send-email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    to: a.email,
-                    template: 'affiliate_payment',
-                    data: {
-                        name: a.name,
-                        amount: amount,
-                        balance: a.balance || 0,
-                        note: note,
-                        affiliate_code: a.affiliate_code
-                    }
-                })
-            }).catch(err => console.error('Email send error:', err));
+            // Send affiliate payment email via Formspree
+            sendAffiliatePaymentEmail(a, amount, note);
 
             successEl.textContent = `✅ Paid R${amount.toFixed(2)} to ${a.name}. Email sent!`;
             successEl.style.display = 'block';
@@ -1034,31 +1008,11 @@
         }
 
         // ============================================================
-        // SERVER CONNECTION TEST
-        // ============================================================
-        function testServerConnection() {
-            const serverUrl = document.getElementById('smtpServerUrl').value.trim();
-            const statusEl = document.getElementById('serverStatus');
-            statusEl.textContent = '⏳ Testing connection...';
-            fetch(serverUrl + '/health')
-                .then(res => res.json())
-                .then(data => {
-                    statusEl.textContent = '✅ Server is online!';
-                    statusEl.style.color = '#28a745';
-                })
-                .catch(err => {
-                    statusEl.textContent = '❌ Server is offline. Run: node server.js';
-                    statusEl.style.color = '#ff4d4d';
-                });
-        }
-
-        // ============================================================
         // INIT
         // ============================================================
         window.onload = function() {
             document.getElementById('loginPage').style.display = 'flex';
             document.getElementById('dashboardPage').style.display = 'none';
-            document.getElementById('smtpServerUrl').value = 'https://shoe-doc-email-server.onrender.com';
         };
     </script>
 </body>
