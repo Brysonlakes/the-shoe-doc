@@ -1,190 +1,300 @@
 const express = require('express');
 const cors = require('cors');
-const app = express();
+const { createClient } = require('@supabase/supabase-js');
 
+const app = express();
 app.use(cors());
 app.use(express.json());
 
 // =====================================================
-// FORMPREE CONFIGURATION
+// 🔥 SUPABASE CONFIGURATION
 // =====================================================
-const FORMPREE_ENDPOINT = 'https://formspree.io/f/mwlkwyjg';
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';  // From Settings → API
+const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';  // From Settings → API
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Health check endpoint
+// Health check
 app.get('/health', (req, res) => {
-    res.json({ status: 'OK', service: 'THE SHOE DOC Email Server' });
+    res.json({ status: 'OK', service: 'THE SHOE DOC API' });
 });
 
-// Email sending endpoint - forwards to Formspree
-app.post('/send-email', async (req, res) => {
-    const { to, template, data } = req.body;
+// ============================================================
+// AFFILIATE ENDPOINTS
+// ============================================================
+
+// Get all affiliates
+app.get('/api/affiliates', async (req, res) => {
+    const { data, error } = await supabase
+        .from('affiliates')
+        .select('*')
+        .order('created_at', { ascending: false });
     
-    if (!to || !template) {
-        return res.status(400).json({ error: 'Missing required fields: to, template' });
-    }
-
-    // ============================================================
-    // EMAIL TEMPLATES
-    // ============================================================
-    const templates = {
-        signup_confirmation: {
-            subject: '✅ Booking Confirmed - THE SHOE DOC',
-            html: `
-                <h2>Hello ${data.name || 'Customer'},</h2>
-                <p>Your booking has been <strong>confirmed</strong>!</p>
-                <p><strong>Service:</strong> ${data.service || 'Shoe Cleaning'}</p>
-                <p><strong>Date:</strong> ${data.date || 'N/A'}</p>
-                <p><strong>Time:</strong> ${data.time || 'N/A'}</p>
-                <p><strong>Total:</strong> R${data.total || '0'}</p>
-                <br>
-                <p>Thank you for choosing THE SHOE DOC!</p>
-                <p>📍 123 Oxford Street, East London</p>
-                <p>📞 082-590-2968</p>
-            `
-        },
-        new_booking: {
-            subject: '📦 New Booking Received - THE SHOE DOC',
-            html: `
-                <h2>New Booking Alert!</h2>
-                <p><strong>Customer:</strong> ${data.customer || 'N/A'}</p>
-                <p><strong>Service:</strong> ${data.service || 'N/A'}</p>
-                <p><strong>Date:</strong> ${data.date || 'N/A'}</p>
-                <p><strong>Time:</strong> ${data.time || 'N/A'}</p>
-                <p><strong>Total:</strong> R${data.total || '0'}</p>
-                <br>
-                <p>Log in to the admin panel to manage this booking.</p>
-            `
-        },
-        payment_confirmed: {
-            subject: '💰 Payment Confirmed - THE SHOE DOC',
-            html: `
-                <h2>Hello ${data.customer || 'Customer'},</h2>
-                <p>Your payment of <strong>R${data.amount || '0'}</strong> has been confirmed!</p>
-                <p>Your booking for <strong>${data.service || 'Shoe Cleaning'}</strong> on <strong>${data.date || 'N/A'}</strong> is now confirmed.</p>
-                <br>
-                <p>Thank you for choosing THE SHOE DOC!</p>
-            `
-        },
-        booking_confirmed: {
-            subject: '✅ Booking Confirmed - THE SHOE DOC',
-            html: `
-                <h2>Hello ${data.customer || 'Customer'},</h2>
-                <p>Your booking has been <strong>confirmed</strong>!</p>
-                <p><strong>Service:</strong> ${data.service || 'Shoe Cleaning'}</p>
-                <p><strong>Date:</strong> ${data.date || 'N/A'}</p>
-                <p><strong>Time:</strong> ${data.time || 'N/A'}</p>
-                <br>
-                <p>Thank you for choosing THE SHOE DOC!</p>
-            `
-        },
-        booking_completed: {
-            subject: '✔️ Service Completed - THE SHOE DOC',
-            html: `
-                <h2>Hello ${data.customer || 'Customer'},</h2>
-                <p>Your <strong>${data.service || 'Shoe Cleaning'}</strong> service has been <strong>completed</strong>!</p>
-                <p>Your shoes are ready for pickup.</p>
-                <br>
-                <p>Thank you for choosing THE SHOE DOC!</p>
-                <p>📍 123 Oxford Street, East London</p>
-            `
-        },
-        booking_ready: {
-            subject: '📦 Ready for Pickup - THE SHOE DOC',
-            html: `
-                <h2>Hello ${data.customer || 'Customer'},</h2>
-                <p>Your shoes are <strong>ready for pickup</strong>!</p>
-                <p>Come visit us at:</p>
-                <p>📍 123 Oxford Street, East London</p>
-                <p>📞 082-590-2968</p>
-                <br>
-                <p>Thank you for choosing THE SHOE DOC!</p>
-            `
-        },
-        shoe_delivered: {
-            subject: '📦 Shoes Delivered - THE SHOE DOC',
-            html: `
-                <h2>Hello ${data.customer || 'Customer'},</h2>
-                <p>Your shoes have been <strong>delivered</strong>!</p>
-                <p>Thank you for choosing THE SHOE DOC!</p>
-                <br>
-                <p>We hope to see you again soon!</p>
-            `
-        },
-        affiliate_earnings: {
-            subject: '💰 Affiliate Earnings - THE SHOE DOC',
-            html: `
-                <h2>Hello ${data.name || 'Affiliate'},</h2>
-                <p>You've earned <strong>R${data.amount || '0'}</strong> from a referral!</p>
-                <p><strong>Customer:</strong> ${data.customer || 'N/A'}</p>
-                <p><strong>Type:</strong> ${data.type || 'Direct Referral'}</p>
-                <p><strong>Current Balance:</strong> R${data.balance || '0'}</p>
-                <br>
-                <p>Keep sharing your affiliate code: <strong>${data.affiliate_code || 'N/A'}</strong></p>
-                <p>Thank you for being part of THE SHOE DOC affiliate program!</p>
-            `
-        },
-        affiliate_payment: {
-            subject: '💰 Affiliate Payment - THE SHOE DOC',
-            html: `
-                <h2>Hello ${data.name || 'Affiliate'},</h2>
-                <p>You've been paid <strong>R${data.amount || '0'}</strong>!</p>
-                <p><strong>Note:</strong> ${data.note || 'Affiliate commission'}</p>
-                <p><strong>New Balance:</strong> R${data.balance || '0'}</p>
-                <br>
-                <p>Thank you for being part of THE SHOE DOC affiliate program!</p>
-            `
-        },
-        reward_update: {
-            subject: '🏆 Reward Points Update - THE SHOE DOC',
-            html: `
-                <h2>Hello ${data.name || 'Customer'},</h2>
-                <p>You've earned <strong>${data.points_earned || 0} reward points</strong>!</p>
-                <p><strong>Total Points:</strong> ${data.total_points || 0}</p>
-                <p>10 points = R5 discount on your next booking!</p>
-                <br>
-                <p>Thank you for choosing THE SHOE DOC!</p>
-            `
-        }
-    };
-
-    const templateData = templates[template];
-    if (!templateData) {
-        return res.status(400).json({ error: 'Invalid template' });
-    }
-
-    try {
-        // ============================================================
-        // SEND EMAIL VIA FORMPREE
-        // ============================================================
-        const formData = new FormData();
-        formData.append('_to', to);
-        formData.append('_subject', templateData.subject);
-        formData.append('_html', templateData.html);
-        // Also send as plain text for Formspree's default email
-        formData.append('message', templateData.html.replace(/<[^>]*>/g, ''));
-
-        const response = await fetch(FORMPREE_ENDPOINT, {
-            method: 'POST',
-            body: formData
-        });
-
-        if (response.ok) {
-            console.log(`✅ Email sent to ${to} (${template}) via Formspree`);
-            res.json({ success: true, message: 'Email sent via Formspree' });
-        } else {
-            const errorText = await response.text();
-            console.error('❌ Formspree error:', response.status, errorText);
-            res.status(response.status).json({ error: 'Formspree error', details: errorText });
-        }
-    } catch (error) {
-        console.error('❌ Error sending to Formspree:', error);
-        res.status(500).json({ error: error.message });
-    }
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
 });
 
-// Start server
+// Register new affiliate
+app.post('/api/affiliates/register', async (req, res) => {
+    const { name, email, phone, password, bank_name, account_number, referral_code } = req.body;
+    
+    // Check if email exists
+    const { data: existing, error: checkError } = await supabase
+        .from('affiliates')
+        .select('email')
+        .eq('email', email)
+        .single();
+    
+    if (existing) {
+        return res.status(400).json({ error: 'Email already registered' });
+    }
+    
+    // Generate affiliate code
+    const prefix = name.substring(0, 3).toUpperCase();
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const affiliateCode = prefix + random;
+    
+    // Check referral code
+    let referredBy = null;
+    if (referral_code) {
+        const { data: referrer } = await supabase
+            .from('affiliates')
+            .select('id')
+            .eq('affiliate_code', referral_code.toUpperCase())
+            .single();
+        if (referrer) referredBy = referrer.id;
+    }
+    
+    // Insert new affiliate
+    const { data, error } = await supabase
+        .from('affiliates')
+        .insert({
+            id: Date.now(),
+            name,
+            email,
+            phone,
+            password,
+            affiliate_code: affiliateCode,
+            referred_by: referredBy,
+            bank_name: bankName,
+            account_number: accountNumber,
+            status: 'active'
+        })
+        .select()
+        .single();
+    
+    if (error) return res.status(500).json({ error: error.message });
+    
+    // If referred, add to downline
+    if (referredBy) {
+        const { data: referrer } = await supabase
+            .from('affiliates')
+            .select('downline')
+            .eq('id', referredBy)
+            .single();
+        
+        if (referrer) {
+            const downline = referrer.downline || [];
+            downline.push(data.id);
+            await supabase
+                .from('affiliates')
+                .update({ downline })
+                .eq('id', referredBy);
+        }
+    }
+    
+    res.json({ success: true, affiliate: data });
+});
+
+// Get affiliate by code
+app.get('/api/affiliates/code/:code', async (req, res) => {
+    const { code } = req.params;
+    const { data, error } = await supabase
+        .from('affiliates')
+        .select('*')
+        .eq('affiliate_code', code.toUpperCase())
+        .single();
+    
+    if (error) return res.status(404).json({ error: 'Affiliate not found' });
+    res.json(data);
+});
+
+// ============================================================
+// BOOKING ENDPOINTS
+// ============================================================
+
+// Create booking
+app.post('/api/bookings', async (req, res) => {
+    const booking = req.body;
+    booking.id = Date.now();
+    booking.created_at = new Date().toISOString();
+    
+    const { data, error } = await supabase
+        .from('bookings')
+        .insert(booking)
+        .select()
+        .single();
+    
+    if (error) return res.status(500).json({ error: error.message });
+    
+    // Update affiliate earnings if affiliate code exists
+    if (booking.affiliate_code) {
+        const { data: affiliate } = await supabase
+            .from('affiliates')
+            .select('*')
+            .eq('affiliate_code', booking.affiliate_code)
+            .single();
+        
+        if (affiliate) {
+            const commission = (booking.total_pairs || 1) * 20;
+            await supabase
+                .from('affiliates')
+                .update({
+                    balance: (affiliate.balance || 0) + commission,
+                    total_earned: (affiliate.total_earned || 0) + commission,
+                    referrals: [...(affiliate.referrals || []), booking.customer]
+                })
+                .eq('id', affiliate.id);
+        }
+    }
+    
+    res.json({ success: true, booking: data });
+});
+
+// Get all bookings
+app.get('/api/bookings', async (req, res) => {
+    const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .order('created_at', { ascending: false });
+    
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+});
+
+// Update booking status
+app.put('/api/bookings/:id', async (req, res) => {
+    const { id } = req.params;
+    const updates = req.body;
+    
+    const { data, error } = await supabase
+        .from('bookings')
+        .update(updates)
+        .eq('id', parseInt(id))
+        .select()
+        .single();
+    
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true, booking: data });
+});
+
+// ============================================================
+// CUSTOMER ENDPOINTS
+// ============================================================
+
+// Register customer
+app.post('/api/customers/register', async (req, res) => {
+    const { name, email, phone, password } = req.body;
+    
+    const { data, error } = await supabase
+        .from('customers')
+        .insert({ id: Date.now(), name, email, phone, password })
+        .select()
+        .single();
+    
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true, customer: data });
+});
+
+// Get customer by email
+app.get('/api/customers/:email', async (req, res) => {
+    const { email } = req.params;
+    const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('email', email)
+        .single();
+    
+    if (error) return res.status(404).json({ error: 'Customer not found' });
+    res.json(data);
+});
+
+// ============================================================
+// REWARDS ENDPOINTS
+// ============================================================
+
+// Get rewards by email
+app.get('/api/rewards/:email', async (req, res) => {
+    const { email } = req.params;
+    const { data, error } = await supabase
+        .from('rewards')
+        .select('*')
+        .eq('email', email)
+        .single();
+    
+    if (error && error.code === 'PGRST116') {
+        // Create default rewards for new user
+        const { data: newData, error: insertError } = await supabase
+            .from('rewards')
+            .insert({ email, points: 0, total_earned: 0, used: 0 })
+            .select()
+            .single();
+        
+        if (insertError) return res.status(500).json({ error: insertError.message });
+        return res.json(newData);
+    }
+    
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+});
+
+// Update rewards
+app.post('/api/rewards/update', async (req, res) => {
+    const { email, points_earned } = req.body;
+    
+    // Get current rewards
+    const { data: current, error: fetchError } = await supabase
+        .from('rewards')
+        .select('*')
+        .eq('email', email)
+        .single();
+    
+    if (fetchError && fetchError.code !== 'PGRST116') {
+        return res.status(500).json({ error: fetchError.message });
+    }
+    
+    if (!current) {
+        // Create new
+        const { data, error } = await supabase
+            .from('rewards')
+            .insert({ email, points: points_earned, total_earned: points_earned, used: 0 })
+            .select()
+            .single();
+        
+        if (error) return res.status(500).json({ error: error.message });
+        return res.json(data);
+    }
+    
+    // Update existing
+    const { data, error } = await supabase
+        .from('rewards')
+        .update({
+            points: (current.points || 0) + points_earned,
+            total_earned: (current.total_earned || 0) + points_earned,
+            updated_at: new Date().toISOString()
+        })
+        .eq('email', email)
+        .select()
+        .single();
+    
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+});
+
+// ============================================================
+// START SERVER
+// ============================================================
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📧 Emails forwarded to Formspree: ${FORMPREE_ENDPOINT}`);
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📊 Database: Supabase`);
 });
