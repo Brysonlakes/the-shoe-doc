@@ -27,7 +27,7 @@
         .header { display:flex; justify-content:space-between; align-items:center; padding:16px 0; border-bottom:1px solid rgba(255,255,255,0.05); margin-bottom:30px; flex-wrap:wrap; gap:12px; }
         .header h1 { font-family:var(--font-serif); font-size:1.6rem; }
         .header h1 span { background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-        .header .btn { padding:8px 20px; border:1px solid #333; border-radius:30px; background:transparent; color:#aaa; cursor:pointer; transition:0.3s; font-weight:500; text-decoration:none; }
+        .header .btn { padding:8px 20px; border:1px solid #333; border-radius:30px; background:transparent; color:#aaa; cursor:pointer; transition:0.3s; font-weight:500; text-decoration:none; display:inline-block; }
         .header .btn:hover { border-color:var(--gold); color:var(--gold); }
         .stats-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:16px; margin-bottom:30px; }
         .stat-card { background:var(--dark-card); padding:16px 20px; border-radius:16px; border:1px solid rgba(255,255,255,0.04); }
@@ -46,6 +46,8 @@
         .empty-state .icon { font-size:3rem; margin-bottom:12px; }
         .copy-btn { background:transparent; border:1px solid #333; color:#aaa; padding:4px 14px; border-radius:30px; cursor:pointer; font-size:0.7rem; transition:0.3s; }
         .copy-btn:hover { border-color:var(--gold); color:var(--gold); }
+        .commission-badge { background:rgba(212,175,55,0.15); color:var(--gold); padding:2px 12px; border-radius:30px; font-size:0.7rem; font-weight:600; }
+        .total-pairs { color:#888; font-size:0.8rem; }
         @media (max-width:480px) { .header h1 { font-size:1.2rem; } .stats-grid { grid-template-columns:1fr 1fr; } .panel { padding:20px 16px; } }
     </style>
 </head>
@@ -70,8 +72,11 @@
             <h3>🔗 Your Affiliate Code</h3>
             <div class="affiliate-code-box">
                 <div class="code" id="affiliateCode">------</div>
-                <p>Share this code with customers. You earn R20 per pair they book!</p>
+                <p>Share this code with customers. You earn <strong>R20 per pair</strong> they book!</p>
                 <button class="copy-btn" onclick="copyCode()">📋 Copy Code</button>
+            </div>
+            <div style="text-align:center; color:#888; font-size:0.85rem;">
+                💰 <strong>R20 per pair</strong> · Paid via EFT when balance reaches <strong>R200</strong>
             </div>
         </div>
 
@@ -107,6 +112,10 @@
             const affiliate = affiliates.find(a => a.id === currentAffiliate.id);
             if (!affiliate) { window.location.href = 'affiliate-register.html'; return; }
 
+            // Calculate total earnings from all referrals
+            const referralBookings = bookings.filter(b => b.affiliate_code === affiliate.affiliate_code);
+            const totalEarnings = referralBookings.reduce((sum, b) => sum + 20, 0);
+            
             document.getElementById('totalEarnings').textContent = 'R' + (affiliate.total_earned || 0);
             document.getElementById('totalReferrals').textContent = (affiliate.referrals || []).length;
             document.getElementById('downlineCount').textContent = (affiliate.downline || []).length;
@@ -116,19 +125,29 @@
             document.getElementById('bankDetails').innerHTML = `
                 <p><strong>Bank:</strong> ${affiliate.bank_name || 'Not set'}</p>
                 <p><strong>Account Number:</strong> ${affiliate.account_number || 'Not set'}</p>
+                <p style="color:#666; font-size:0.8rem; margin-top:8px;">Update your bank details in the affiliate registration page.</p>
             `;
 
-            const referralBookings = bookings.filter(b => b.affiliate_code === affiliate.affiliate_code);
+            // Referrals with pair count
             const referralsContainer = document.getElementById('referralsList');
             if (referralBookings.length === 0) {
                 referralsContainer.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>No referrals yet. Share your code!</p></div>`;
             } else {
-                let html = `<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Service</th><th>Date</th><th>Commission</th></tr></thead><tbody>`;
-                referralBookings.forEach(b => { html += `<tr><td>${b.customer}</td><td>${b.service}</td><td>${b.date}</td><td>R20</td></tr>`; });
+                let html = `<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Service</th><th>Pairs</th><th>Date</th><th>Commission</th></tr></thead><tbody>`;
+                referralBookings.forEach(b => { 
+                    html += `<tr>
+                        <td><strong>${b.customer}</strong></td>
+                        <td>${b.service}</td>
+                        <td><span class="commission-badge">${b.pairs || 1} pair${(b.pairs || 1) > 1 ? 's' : ''}</span></td>
+                        <td>${b.date}</td>
+                        <td><strong style="color:var(--gold);">R${(b.pairs || 1) * 20}</strong></td>
+                    </tr>`; 
+                });
                 html += `</tbody></table></div>`;
                 referralsContainer.innerHTML = html;
             }
 
+            // Downline affiliates
             const downlineContainer = document.getElementById('downlineList');
             const downline = affiliate.downline || [];
             if (downline.length === 0) {
@@ -137,7 +156,7 @@
                 const downlineAffiliates = affiliates.filter(a => downline.includes(a.id));
                 let html = `<div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Code</th><th>Status</th></tr></thead><tbody>`;
                 downlineAffiliates.forEach(a => {
-                    html += `<tr><td>${a.name}</td><td>${a.email}</td><td>${a.affiliate_code}</td><td><span style="color:${a.status === 'active' ? '#28a745' : '#ffc107'};">${a.status}</span></td></tr>`;
+                    html += `<tr><td><strong>${a.name}</strong></td><td>${a.email}</td><td>${a.affiliate_code}</td><td><span style="color:${a.status === 'active' ? '#28a745' : '#ffc107'};">${a.status}</span></td></tr>`;
                 });
                 html += `</tbody></table></div>`;
                 downlineContainer.innerHTML = html;
