@@ -53,6 +53,7 @@
         .empty-state a:hover { text-decoration:underline; }
         .affiliate-section { background:var(--dark-card); border-radius:16px; padding:20px; border:1px solid rgba(212,175,55,0.1); margin-top:20px; }
         .affiliate-section h3 { font-family:var(--font-serif); color:var(--white); margin-bottom:12px; border-left:4px solid var(--gold); padding-left:12px; }
+        .pairs-badge { background:rgba(212,175,55,0.12); color:var(--gold); padding:2px 12px; border-radius:30px; font-size:0.7rem; font-weight:600; }
         @media (max-width:480px) { .header h1 { font-size:1.2rem; } .stats-grid { grid-template-columns:1fr 1fr; } }
     </style>
 </head>
@@ -72,6 +73,7 @@
 
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card"><div class="label">Total Bookings</div><div class="value" id="totalBookings">0</div></div>
+            <div class="stat-card"><div class="label">Total Pairs</div><div class="value" id="totalPairs">0</div></div>
             <div class="stat-card"><div class="label">Pending</div><div class="value" id="pendingBookings">0</div></div>
             <div class="stat-card"><div class="label">Completed</div><div class="value" id="completedBookings">0</div></div>
             <div class="stat-card"><div class="label">Total Spent</div><div class="value" id="totalSpent">R0</div></div>
@@ -99,7 +101,7 @@
 
         <div class="affiliate-section">
             <h3>💰 Become an Affiliate</h3>
-            <p style="color:#888; margin-bottom:12px;">Earn R20 per pair you refer. Start earning today!</p>
+            <p style="color:#888; margin-bottom:12px;">Earn <strong>R20 per pair</strong> you refer. Start earning today!</p>
             <a href="affiliate-register.html" class="btn" style="display:inline-block; padding:10px 24px; border:1px solid var(--gold); border-radius:30px; color:var(--gold); text-decoration:none;">Become an Affiliate</a>
         </div>
     </div>
@@ -122,10 +124,12 @@
             document.getElementById('customerName').textContent = customer.name || customer.customer || 'Customer';
 
             const total = customerBookings.length;
+            const totalPairs = customerBookings.reduce((sum, b) => sum + (b.pairs || 1), 0);
             const pending = customerBookings.filter(b => b.status === 'pending_payment' || b.status === 'pending').length;
             const completed = customerBookings.filter(b => b.status === 'completed').length;
             const totalSpent = customerBookings.reduce((sum, b) => sum + (b.totalDue || 0), 0);
             document.getElementById('totalBookings').textContent = total;
+            document.getElementById('totalPairs').textContent = totalPairs;
             document.getElementById('pendingBookings').textContent = pending;
             document.getElementById('completedBookings').textContent = completed;
             document.getElementById('totalSpent').textContent = 'R' + totalSpent;
@@ -141,12 +145,20 @@
                 container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>You haven't made any bookings yet.</p><p><a href="booking.html">Book your first cleaning now!</a></p></div>`;
                 return;
             }
-            let html = `<table><thead><tr><th>Invoice</th><th>Service</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead><tbody>`;
+            let html = `<table><thead><tr><th>Invoice</th><th>Service</th><th>Pairs</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead><tbody>`;
             customerBookings.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             customerBookings.forEach(b => {
                 const statusClass = `status-${b.status}`;
                 const statusText = b.status.charAt(0).toUpperCase() + b.status.slice(1).replace('_', ' ');
-                html += `<tr><td><strong>${b.invoice || 'N/A'}</strong></td><td>${b.service}</td><td>${b.date}</td><td>R${b.totalDue || 0}</td><td><span class="status-badge ${statusClass}">${statusText}</span></td></tr>`;
+                const pairsDisplay = b.pairs || 1;
+                html += `<tr>
+                    <td><strong>${b.invoice || 'N/A'}</strong></td>
+                    <td>${b.service}</td>
+                    <td><span class="pairs-badge">${pairsDisplay} pair${pairsDisplay > 1 ? 's' : ''}</span></td>
+                    <td>${b.date}</td>
+                    <td>R${b.totalDue || 0}</td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                </tr>`;
             });
             html += `</tbody></table>`;
             container.innerHTML = html;
