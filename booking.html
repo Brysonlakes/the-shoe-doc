@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>THE SHOE DOC · Book Now</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--gold:#D4AF37;--gold-grad:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);--dark:#0A0A0A;--card:#141414;--surface:#1A1A1A}
+body{font-family:'Inter',sans-serif;background:var(--dark);color:#E0E0E0;line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+.hero{min-height:100vh;display:flex;align-items:center;padding:40px 0}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(3rem,8vw,6rem);line-height:1;margin-bottom:16px;color:#fff}
+.gold{background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.tagline{max-width:500px;margin-bottom:36px;color:#B0B0B0}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 32px;border-radius:50px;border:none;cursor:pointer;font-weight:600;font-size:1rem;transition:.3s;text-decoration:none;margin:4px 4px 4px 0}
+.btn-gold{background:var(--gold-grad);color:#000}
+.btn-gold:hover{transform:translateY(-3px);box-shadow:0 0 40px rgba(212,175,55,.5)}
+.btn-wa{background:#25D366;color:#fff}
+.btn-wa:hover{background:#1DA851}
+.section{padding:60px 0}
+.section h2{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.5rem);text-align:center;color:#fff;margin-bottom:8px}
+.section p.sub{text-align:center;color:#888;margin-bottom:32px}
+.services{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.sc{background:var(--card);padding:28px 20px;border-radius:20px;text-align:center;border:1px solid rgba(255,255,255,.04);transition:.3s}
+.sc:hover{transform:translateY(-6px);border-color:rgba(212,175,55,.3)}
+.sc .ic{font-size:2.5rem;margin-bottom:8px}
+.sc h3{font-family:'Playfair Display',serif;color:#fff;font-size:1.3rem}
+.sc .pr{color:var(--gold);font-size:2rem;font-weight:700;font-family:'Playfair Display',serif;margin:8px 0 16px}
+.sc button{padding:8px 20px;border-radius:50px;border:1px solid var(--gold);background:transparent;color:var(--gold);cursor:pointer;font-weight:600}
+.sc button:hover{background:var(--gold-grad);color:#000}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(5px);z-index:1000;justify-content:center;align-items:center;padding:20px}
+.modal.active{display:flex}
+.mbox{background:var(--card);max-width:600px;width:100%;border-radius:24px;padding:40px 32px;border:1px solid rgba(212,175,55,.2);max-height:95vh;overflow-y:auto;position:relative}
+.close{position:absolute;top:16px;right:20px;background:none;border:none;color:#888;font-size:1.8rem;cursor:pointer}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:.85rem;font-weight:600;color:#aaa;margin-bottom:4px}
+.fg input,.fg select,.fg textarea{width:100%;padding:12px 16px;border-radius:12px;border:1px solid #2a2a2a;background:#0f0f0f;color:#fff;font-size:1rem;outline:none;font-family:inherit}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold)}
+.srow{display:flex;gap:8px;align-items:center;margin-bottom:8px;background:rgba(255,255,255,.02);padding:8px;border-radius:8px;flex-wrap:wrap}
+.srow select{flex:2;min-width:140px;padding:8px;border-radius:8px;border:1px solid #2a2a2a;background:#0f0f0f;color:#fff}
+.srow input[type=number]{flex:0 0 70px;padding:8px;border-radius:8px;border:1px solid #2a2a2a;background:#0f0f0f;color:#fff}
+.srow .price{color:var(--gold);font-weight:600;min-width:60px}
+.srow .rm{background:none;border:none;color:#ff4d4d;cursor:pointer;font-size:1.2rem;padding:0 6px}
+.add-btn{background:transparent;border:1px dashed #333;color:#888;padding:8px 16px;border-radius:30px;cursor:pointer;width:100%;margin-top:4px;font-size:.9rem}
+.add-btn:hover{border-color:var(--gold);color:var(--gold)}
+.pbox{background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.15);border-radius:12px;padding:16px;margin:16px 0}
+.pbox .row{display:flex;justify-content:space-between;padding:4px 0}
+.pbox .total{font-size:1.3rem;font-weight:700;color:var(--gold);border-top:1px solid rgba(255,255,255,.1);margin-top:8px;padding-top:8px}
+.success{display:none;background:rgba(40,167,69,.1);border:1px solid #28a745;border-radius:12px;padding:24px;text-align:center}
+.success h3{color:#28a745;margin-bottom:12px}
+footer{padding:40px 24px;text-align:center;border-top:1px solid rgba(255,255,255,.05);margin-top:40px;color:#666;font-size:.85rem}
+footer a{color:var(--gold);text-decoration:none;margin:0 8px}
+@media(max-width:480px){.mbox{padding:24px 16px}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+<div class="container">
+<h1><span class="gold">THE</span><br>SHOE DOC</h1>
+<p class="tagline">We give the best shoe cleaning services in East London. Premium care for your sneakers and formal shoes.</p>
+<a href="https://wa.me/27825902968" class="btn btn-wa">WhatsApp</a>
+<button class="btn btn-gold" onclick="openModal()">📅 Book Now</button>
+</div>
+</header>
+
+<section class="section">
+<div class="container">
+<h2>Prices <span class="gold">Per Pair</span></h2>
+<p class="sub">Professional cleaning tailored to your shoes</p>
+<div class="services">
+<div class="sc"><div class="ic">🧼</div><h3>Basic Wash</h3><div class="pr">R60</div><button onclick="openModal()">Book Now</button></div>
+<div class="sc"><div class="ic">✨</div><h3>Deep Clean</h3><div class="pr">R100</div><button onclick="openModal()">Book Now</button></div>
+<div class="sc"><div class="ic">👑</div><h3>Premium Care</h3><div class="pr">R150</div><button onclick="openModal()">Book Now</button></div>
+<div class="sc"><div class="ic">⚪</div><h3>Sole Whitening</h3><div class="pr">R120</div><button onclick="openModal()">Book Now</button></div>
+</div>
+</div>
+</section>
+
+<footer>
+<p>© 2026 THE SHOE DOC · East London</p>
+<p style="margin-top:8px"><a href="index.html">🔐 Login</a> | <a href="admin.html">🔐 Admin</a></p>
+</footer>
+
+<!-- BOOKING MODAL -->
+<div class="modal" id="bookingModal">
+<div class="mbox">
+<button class="close" onclick="closeModal()">&times;</button>
+
+<div id="formView">
+<h2 style="font-family:'Playfair Display',serif;color:#fff;margin-bottom:4px">📅 Book Your Cleaning</h2>
+<p style="color:#888;margin-bottom:20px">Mix and match services with quantities.</p>
+
+<div class="fg"><label>Full Name *</label><input type="text" id="fName" placeholder="Thabo M."></div>
+<div class="fg"><label>Phone *</label><input type="tel" id="fPhone" placeholder="082 123 4567"></div>
+<div class="fg"><label>Email *</label><input type="email" id="fEmail" placeholder="you@email.com"></div>
+
+<div class="fg">
+<label>Services & Quantities *</label>
+<div id="servicesBox">
+<div class="srow">
+<select class="svc"><option value="Basic Wash">🧼 Basic Wash (R60)</option><option value="Deep Clean">✨ Deep Clean (R100)</option><option value="Premium Care">👑 Premium Care (R150)</option><option value="Sole Whitening">⚪ Sole Whitening (R120)</option></select>
+<input type="number" class="qty" value="1" min="1" max="20">
+<span class="price">R60</span>
+<button class="rm" onclick="removeRow(this)">✕</button>
+</div>
+</div>
+<button class="add-btn" onclick="addRow()">➕ Add Another Service</button>
+</div>
+
+<div class="pbox">
+<div class="row"><span>Total Pairs:</span><span id="pTotalPairs">1</span></div>
+<div class="row"><span>Subtotal:</span><span id="pSubtotal">R60</span></div>
+<div class="row total"><span>Total:</span><span id="pTotal">R60</span></div>
+<div class="row" style="font-size:.8rem;color:#888"><span>Deposit (50%):</span><span id="pDeposit">R30</span></div>
+</div>
+
+<div class="fg"><label>Delivery *</label>
+<select id="fDelivery" onchange="updatePrice()"><option value="bring">Bring to shop (Free)</option><option value="fetch">Fetch (R40)</option></select>
+</div>
+<div class="fg"><label>Payment *</label>
+<select id="fPayment"><option value="payfast">Payfast (Online Deposit)</option><option value="cash">Cash at Shop</option></select>
+</div>
+<div class="fg"><label>Affiliate Code (optional)</label><input type="text" id="fAffiliate" placeholder="e.g. THO123"></div>
+<div class="fg"><label>Date *</label><input type="date" id="fDate"></div>
+<div class="fg"><label>Time *</label><input type="time" id="fTime"></div>
+<div class="fg"><label>Notes (optional)</label><textarea id="fNotes" rows="2"></textarea></div>
+
+<button class="btn btn-gold" style="width:100%" onclick="submitBooking()">📅 Confirm Booking</button>
+</div>
+
+<div id="successView" class="success">
+<h3>✅ Booking Submitted!</h3>
+<p>Your booking has been saved.</p>
+<p style="color:#888;font-size:.85rem;margin-top:8px">You will receive a confirmation email shortly.</p>
+<button class="btn btn-gold" style="margin-top:16px" onclick="closeModal()">Close</button>
+</div>
+
+</div>
+</div>
+
+<script>
+const supabase = window.supabase.createClient(
+  'https://nvrsiiwkdsqgtsaokubn.supabase.co',
+  'sb_publishable_yiBiiJvpawWZSw1pzVBPLg_gU3-JNJp'
+);
+
+const PRICES = {'Basic Wash':60,'Deep Clean':100,'Premium Care':150,'Sole Whitening':120};
+const DELIVERY = 40;
+
+function openModal(){
+  document.getElementById('bookingModal').classList.add('active');
+  document.body.style.overflow='hidden';
+  document.getElementById('formView').style.display='block';
+  document.getElementById('successView').style.display='none';
+  const t=new Date();t.setDate(t.getDate()+1);
+  document.getElementById('fDate').value=t.toISOString().split('T')[0];
+  ['fName','fPhone','fEmail','fAffiliate','fNotes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fTime').value='';
+  document.getElementById('fDelivery').value='bring';
+  document.getElementById('fPayment').value='payfast';
+  document.getElementById('servicesBox').innerHTML=`
+  <div class="srow">
+    <select class="svc"><option value="Basic Wash">🧼 Basic Wash (R60)</option><option value="Deep Clean">✨ Deep Clean (R100)</option><option value="Premium Care">👑 Premium Care (R150)</option><option value="Sole Whitening">⚪ Sole Whitening (R120)</option></select>
+    <input type="number" class="qty" value="1" min="1" max="20">
+    <span class="price">R60</span>
+    <button class="rm" onclick="removeRow(this)">✕</button>
+  </div>`;
+  attachEvents();
+  updatePrice();
+}
+
+function closeModal(){
+  document.getElementById('bookingModal').classList.remove('active');
+  document.body.style.overflow='';
+}
+
+function addRow(){
+  const box=document.getElementById('servicesBox');
+  const div=document.createElement('div');
+  div.className='srow';
+  div.innerHTML=`
+    <select class="svc"><option value="Basic Wash">🧼 Basic Wash (R60)</option><option value="Deep Clean">✨ Deep Clean (R100)</option><option value="Premium Care">👑 Premium Care (R150)</option><option value="Sole Whitening">⚪ Sole Whitening (R120)</option></select>
+    <input type="number" class="qty" value="1" min="1" max="20">
+    <span class="price">R60</span>
+    <button class="rm" onclick="removeRow(this)">✕</button>`;
+  box.appendChild(div);
+  attachEvents();
+  updatePrice();
+}
+
+function removeRow(btn){
+  const rows=document.querySelectorAll('.srow');
+  if(rows.length<=1){alert('Need at least one service');return;}
+  btn.closest('.srow').remove();
+  updatePrice();
+}
+
+function attachEvents(){
+  document.querySelectorAll('.svc').forEach(s=>{s.onchange=updatePrice;});
+  document.querySelectorAll('.qty').forEach(q=>{q.onchange=updatePrice;});
+}
+
+function getRows(){
+  const rows=[];
+  document.querySelectorAll('.srow').forEach(r=>{
+    const svc=r.querySelector('.svc').value;
+    const qty=parseInt(r.querySelector('.qty').value)||1;
+    rows.push({service:svc,quantity:qty,price:PRICES[svc]*qty});
+  });
+  return rows;
+}
+
+function updatePrice(){
+  const rows=getRows();
+  let totalPairs=0,subtotal=0;
+  rows.forEach(r=>{totalPairs+=r.quantity;subtotal+=r.price;});
+  document.querySelectorAll('.srow').forEach((row,i)=>{
+    row.querySelector('.price').textContent='R'+rows[i].price;
+  });
+  const delivery=document.getElementById('fDelivery').value==='fetch'?DELIVERY:0;
+  const total=subtotal+delivery;
+  const deposit=Math.max(30,Math.round(total*0.5));
+  document.getElementById('pTotalPairs').textContent=totalPairs;
+  document.getElementById('pSubtotal').textContent='R'+subtotal;
+  document.getElementById('pTotal').textContent='R'+total;
+  document.getElementById('pDeposit').textContent='R'+deposit;
+}
+
+async function submitBooking(){
+  const name=document.getElementById('fName').value.trim();
+  const phone=document.getElementById('fPhone').value.trim();
+  const email=document.getElementById('fEmail').value.trim();
+  const date=document.getElementById('fDate').value;
+  const time=document.getElementById('fTime').value;
+  const notes=document.getElementById('fNotes').value.trim();
+  const delivery=document.getElementById('fDelivery').value;
+  const payment=document.getElementById('fPayment').value;
+  const affiliate=document.getElementById('fAffiliate').value.trim().toUpperCase();
+
+  if(!name||!phone||!email||!date||!time){alert('Please fill in all required fields');return;}
+
+  const rows=getRows();
+  let totalPairs=0,subtotal=0;
+  rows.forEach(r=>{totalPairs+=r.quantity;subtotal+=r.price;});
+  const servicesList=rows.map(r=>`${r.service} (${r.quantity} pair${r.quantity>1?'s':''})`).join(', ');
+  const deliveryFee=delivery==='fetch'?DELIVERY:0;
+  const deposit=Math.max(30,Math.round((subtotal+deliveryFee)*0.5));
+  const invoice='INV-'+Date.now().toString().slice(-8);
+  const pointsEarned=Math.floor(subtotal/10);
+
+  const booking={
+    id:Date.now(),
+    invoice:invoice,
+    customer:name,
+    phone:phone,
+    email:email,
+    services_list:servicesList,
+    total_pairs:totalPairs,
+    subtotal:subtotal,
+    date:date,
+    time:time,
+    notes:notes,
+    delivery_option:delivery,
+    delivery_address:'N/A',
+    deposit:deposit,
+    delivery_fee:deliveryFee,
+    total_due:deposit+deliveryFee,
+    payment_method:payment,
+    affiliate_code:affiliate||null,
+    discount_applied:0,
+    points_used:0,
+    points_earned:pointsEarned,
+    status:payment==='cash'?'confirmed':'pending_payment',
+    paid:false
+  };
+
+  const {data,error}=await supabase.from('bookings').insert([booking]).select();
+  if(error){console.error('Error:',error);alert('❌ Error saving booking: '+error.message);return;}
+
+  // Update rewards
+  if(email){
+    const{data:r}=await supabase.from('rewards').select('*').eq('email',email).single();
+    if(r){
+      await supabase.from('rewards').update({points:(r.points||0)+pointsEarned,total_earned:(r.total_earned||0)+pointsEarned}).eq('email',email);
+    }else{
+      await supabase.from('rewards').insert([{email,points:pointsEarned,total_earned:pointsEarned,used:0}]);
+    }
+  }
+
+  // Update affiliate
+  if(affiliate){
+    const{data:a}=await supabase.from('affiliates').select('*').eq('affiliate_code',affiliate).single();
+    if(a){
+      const commission=totalPairs*20;
+      await supabase.from('affiliates').update({
+        balance:(a.balance||0)+commission,
+        total_earned:(a.total_earned||0)+commission
+      }).eq('id',a.id);
+    }
+  }
+
+  // Send confirmation email via Formspree
+  sendEmail(email,{
+    _subject:'✅ Booking Confirmed - THE SHOE DOC',
+    customer:name,phone:phone,services:servicesList,
+    totalPairs:totalPairs,date:date,time:time,total:'R'+(deposit+deliveryFee)
+  });
+
+  // Send admin email
+  sendEmail('theshoedoc3@gmail.com',{
+    _subject:'📦 New Booking - THE SHOE DOC',
+    customer:name,phone:phone,email:email,services:servicesList,
+    totalPairs:totalPairs,date:date,time:time,total:'R'+(deposit+deliveryFee)
+  });
+
+  document.getElementById('formView').style.display='none';
+  document.getElementById('successView').style.display='block';
+}
+
+function sendEmail(to,data){
+  const form=document.createElement('form');
+  form.method='POST';
+  form.action='https://formspree.io/f/xoeqprgy';
+  form.target='_blank';
+  form.style.display='none';
+  const fields=Object.assign({},data);
+  Object.keys(fields).forEach(k=>{
+    const i=document.createElement('input');
+    i.type='hidden';i.name=k;i.value=fields[k];
+    form.appendChild(i);
+  });
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+}
+
+document.getElementById('bookingModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+</script>
+</body>
+</html>
