@@ -124,13 +124,20 @@ function showMsg(t,cls){
 }
 
 function doLogin(){
-  if(role==='admin'){
+    if(role==='admin'){
     var u=document.getElementById('aUser').value.trim();
     var p=document.getElementById('aPass').value.trim();
-    if(u==='admin'&&p==='admin123'){
-      showMsg('✅ Login successful! Redirecting...','ok');
-      setTimeout(function(){location.href='admin.html';},700);
-    }else{showMsg('❌ Invalid username or password','err');}
+    if(!u||!p){showMsg('❌ Enter username and password','err');return;}
+    db.from('settings').select('*').eq('key','admin_password').then(function(r){
+      var realPass='admin123';
+      if(r.data && r.data.length>0) realPass=r.data[0].value;
+      if(u==='admin' && p===realPass){
+        showMsg('✅ Login successful! Redirecting...','ok');
+        setTimeout(function(){location.href='admin.html';},700);
+      }else{
+        showMsg('❌ Invalid username or password','err');
+      }
+    });
     return;
   }
   if(role==='customer'){
