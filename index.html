@@ -21,13 +21,22 @@ body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#E0E0E0;min-height:
 .fg input:focus{border-color:#D4AF37}
 .btn{width:100%;padding:14px;border:none;border-radius:50px;font-weight:700;font-size:1rem;background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);color:#000;cursor:pointer;margin-top:8px}
 .btn:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(212,175,55,.3)}
-.btn2{display:block;text-align:center;text-decoration:none;padding:12px;border:1px solid #333;border-radius:50px;color:#aaa;font-weight:600;margin-top:10px;font-size:.9rem}
+.btn2{display:block;text-align:center;text-decoration:none;padding:12px;border:1px solid #333;border-radius:50px;color:#aaa;font-weight:600;margin-top:10px;font-size:.9rem;cursor:pointer;background:transparent;width:100%}
 .btn2:hover{border-color:#D4AF37;color:#D4AF37}
 .msg{margin-top:12px;font-size:.85rem;text-align:center;display:none;padding:10px;border-radius:8px}
 .msg.err{display:block;color:#ff4d4d;background:rgba(255,77,77,.1)}
 .msg.ok{display:block;color:#28a745;background:rgba(40,167,69,.1)}
 .hide{display:none}
-@media(max-width:480px){.box{padding:28px 20px}}
+.link{color:#D4AF37;cursor:pointer;text-decoration:underline;font-weight:600}
+.switcher{text-align:center;margin-top:12px;font-size:.85rem;color:#888}
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(5px);z-index:1000;justify-content:center;align-items:center;padding:20px;overflow-y:auto}
+.modal.on{display:flex}
+.mbox{background:#141414;border-radius:24px;padding:32px;border:1px solid rgba(212,175,55,.2);max-width:440px;width:100%;position:relative;max-height:95vh;overflow-y:auto}
+.close{position:absolute;top:12px;right:16px;background:none;border:none;color:#888;font-size:1.8rem;cursor:pointer}
+.mbox h2{font-family:'Playfair Display',serif;color:#fff;font-size:1.5rem;margin-bottom:6px}
+.mbox p.sub{color:#888;font-size:.9rem;margin-bottom:20px}
+@media(max-width:480px){.box{padding:28px 20px}.mbox{padding:24px 20px}}
 </style>
 </head>
 <body>
@@ -41,16 +50,19 @@ body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#E0E0E0;min-height:
 <button data-role="affiliate" onclick="switchRole('affiliate')">💰 Affiliate</button>
 </div>
 
+<!-- ADMIN -->
 <div id="adminFields">
 <div class="fg"><label>Username</label><input type="text" id="aUser" placeholder="admin"></div>
 <div class="fg"><label>Password</label><input type="password" id="aPass" placeholder="••••••"></div>
 </div>
 
+<!-- CUSTOMER -->
 <div id="customerFields" class="hide">
 <div class="fg"><label>Email</label><input type="email" id="cEmail" placeholder="you@email.com"></div>
 <div class="fg"><label>Password</label><input type="password" id="cPass" placeholder="••••••"></div>
 </div>
 
+<!-- AFFILIATE -->
 <div id="affiliateFields" class="hide">
 <div class="fg"><label>Email</label><input type="email" id="fEmail" placeholder="you@email.com"></div>
 <div class="fg"><label>Password</label><input type="password" id="fPass" placeholder="••••••"></div>
@@ -59,8 +71,30 @@ body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#E0E0E0;min-height:
 <button class="btn" onclick="doLogin()">Sign In</button>
 <div id="msg" class="msg"></div>
 
+<div id="customerSwitch" class="switcher hide">
+New customer? <span class="link" onclick="openRegister()">Register here</span>
+</div>
+
 <a href="booking.html" class="btn2">📅 Book Now (No Login Required)</a>
-<a href="affiliate-register.html" class="btn2" style="border-color:#28a745;color:#28a745">💰 Become an Affiliate</a>
+<button class="btn2" style="border-color:#28a745;color:#28a745" onclick="location.href='affiliate-register.html'">💰 Become an Affiliate</button>
+</div>
+
+<!-- REGISTER MODAL -->
+<div class="modal" id="regModal">
+<div class="mbox">
+<button class="close" onclick="closeRegister()">&times;</button>
+<h2>📝 Create Customer Account</h2>
+<p class="sub">Register to track your bookings and earn reward points.</p>
+
+<div class="fg"><label>Full Name *</label><input type="text" id="rName" placeholder="Thabo M."></div>
+<div class="fg"><label>Email *</label><input type="email" id="rEmail" placeholder="you@email.com"></div>
+<div class="fg"><label>Phone *</label><input type="tel" id="rPhone" placeholder="082 123 4567"></div>
+<div class="fg"><label>Password *</label><input type="password" id="rPass" placeholder="Min 6 characters"></div>
+<div class="fg"><label>Confirm Password *</label><input type="password" id="rPass2" placeholder="Repeat password"></div>
+
+<button class="btn" onclick="doRegister()">Create Account</button>
+<div id="rMsg" class="msg"></div>
+</div>
 </div>
 
 <script>
@@ -79,6 +113,7 @@ function switchRole(r){
   document.getElementById('adminFields').classList.toggle('hide',r!=='admin');
   document.getElementById('customerFields').classList.toggle('hide',r!=='customer');
   document.getElementById('affiliateFields').classList.toggle('hide',r!=='affiliate');
+  document.getElementById('customerSwitch').classList.toggle('hide',r!=='customer');
   showMsg('');
 }
 
@@ -95,49 +130,99 @@ function doLogin(){
     if(u==='admin'&&p==='admin123'){
       showMsg('✅ Login successful! Redirecting...','ok');
       setTimeout(function(){location.href='admin.html';},700);
-    }else{
-      showMsg('❌ Invalid username or password','err');
-    }
+    }else{showMsg('❌ Invalid username or password','err');}
     return;
   }
-
   if(role==='customer'){
     var e=document.getElementById('cEmail').value.trim();
     var p2=document.getElementById('cPass').value.trim();
     if(!e||!p2){showMsg('❌ Enter email and password','err');return;}
-    db.from('customers').select('*').eq('email',e).then(function(r){
-      if(!r.data||r.data.length===0){
-        showMsg('❌ No account found with this email','err');return;
-      }
-      var cust=r.data[0];
-      if(cust.password!==p2){
-        showMsg('❌ Wrong password','err');return;
-      }
-      localStorage.setItem('currentCustomer',JSON.stringify(cust));
-      showMsg('✅ Welcome '+cust.name+'!','ok');
+    db.from('customers').select('*').ilike('email',e).then(function(r){
+      if(!r.data||r.data.length===0){showMsg('❌ No account found. Register below.','err');return;}
+      var c=r.data[0];
+      if(c.password!==p2){showMsg('❌ Wrong password','err');return;}
+      localStorage.setItem('currentCustomer',JSON.stringify(c));
+      showMsg('✅ Welcome '+c.name+'!','ok');
       setTimeout(function(){location.href='dashboard.html';},700);
     });
     return;
   }
-
   if(role==='affiliate'){
     var e2=document.getElementById('fEmail').value.trim();
     var p3=document.getElementById('fPass').value.trim();
     if(!e2||!p3){showMsg('❌ Enter email and password','err');return;}
-    db.from('affiliates').select('*').eq('email',e2).then(function(r){
-      if(!r.data||r.data.length===0){
-        showMsg('❌ No affiliate account found','err');return;
-      }
-      var aff=r.data[0];
-      if(aff.password!==p3){
-        showMsg('❌ Wrong password','err');return;
-      }
-      localStorage.setItem('currentAffiliate',JSON.stringify(aff));
-      showMsg('✅ Welcome '+aff.name+'!','ok');
+    db.from('affiliates').select('*').ilike('email',e2).then(function(r){
+      if(!r.data||r.data.length===0){showMsg('❌ No affiliate account found','err');return;}
+      var a=r.data[0];
+      if(a.password!==p3){showMsg('❌ Wrong password','err');return;}
+      localStorage.setItem('currentAffiliate',JSON.stringify(a));
+      showMsg('✅ Welcome '+a.name+'!','ok');
       setTimeout(function(){location.href='affiliate-dashboard.html';},700);
     });
   }
 }
+
+// ============ REGISTER ============
+function openRegister(){
+  document.getElementById('regModal').classList.add('on');
+  document.body.style.overflow='hidden';
+  ['rName','rEmail','rPhone','rPass','rPass2'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('rMsg').className='msg';
+}
+function closeRegister(){
+  document.getElementById('regModal').classList.remove('on');
+  document.body.style.overflow='';
+}
+document.getElementById('regModal').addEventListener('click',function(e){
+  if(e.target===this)closeRegister();
+});
+
+function showRMsg(t,cls){
+  var m=document.getElementById('rMsg');
+  m.textContent=t;
+  m.className='msg '+cls;
+}
+
+function doRegister(){
+  var name=document.getElementById('rName').value.trim();
+  var email=document.getElementById('rEmail').value.trim();
+  var phone=document.getElementById('rPhone').value.trim();
+  var pass=document.getElementById('rPass').value;
+  var pass2=document.getElementById('rPass2').value;
+
+  if(!name||!email||!phone||!pass||!pass2){
+    showRMsg('❌ Please fill in all fields','err');return;
+  }
+  if(pass.length<6){showRMsg('❌ Password must be at least 6 characters','err');return;}
+  if(pass!==pass2){showRMsg('❌ Passwords do not match','err');return;}
+
+  // Check existing
+  db.from('customers').select('email').ilike('email',email).then(function(r){
+    if(r.data && r.data.length>0){
+      showRMsg('❌ This email is already registered','err');
+      return;
+    }
+    var newCust={
+      id:Date.now(),
+      name:name,
+      email:email,
+      phone:phone,
+      password:pass
+    };
+    db.from('customers').insert([newCust]).select().then(function(res){
+      if(res.error){
+        showRMsg('❌ '+res.error.message,'err');
+        return;
+      }
+      showRMsg('✅ Account created! Logging you in...','ok');
+      localStorage.setItem('currentCustomer',JSON.stringify(res.data[0]));
+      setTimeout(function(){location.href='dashboard.html';},1200);
+    });
+  });
+}
+
+// Init
+switchRole('admin');
 </script>
 </body>
 </html>
