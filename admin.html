@@ -14,51 +14,55 @@ body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#E0E0E0;min-height:
 .head{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:24px;flex-wrap:wrap;gap:12px}
 .head h1{font-family:'Playfair Display',serif;font-size:1.5rem;color:#fff}
 .gold{background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.btn{padding:8px 18px;border:1px solid #333;border-radius:30px;background:transparent;color:#aaa;cursor:pointer;font-weight:500;text-decoration:none;font-size:.85rem;display:inline-block}
+.btn{padding:10px 20px;border:1px solid #333;border-radius:30px;background:transparent;color:#ddd;cursor:pointer;font-weight:600;text-decoration:none;font-size:.85rem;display:inline-block;white-space:nowrap}
 .btn:hover{border-color:#D4AF37;color:#D4AF37}
 .btn.gold{background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);color:#000;border:none;font-weight:700}
+.btn.gold:hover{transform:translateY(-1px);box-shadow:0 0 20px rgba(212,175,55,.4)}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;border-bottom:1px solid #222;padding-bottom:8px}
-.tabs button{padding:8px 16px;border:none;border-radius:30px;background:transparent;color:#888;font-weight:600;font-size:.82rem;cursor:pointer}
+.tabs button{padding:8px 16px;border:none;border-radius:30px;background:transparent;color:#aaa;font-weight:600;font-size:.82rem;cursor:pointer}
 .tabs button.active{background:rgba(212,175,55,.15);color:#D4AF37}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:20px}
 .stat{background:#141414;padding:14px 18px;border-radius:14px;border:1px solid rgba(255,255,255,.04)}
-.stat .lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:1px;color:#666}
+.stat .lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:1px;color:#888}
 .stat .val{font-family:'Playfair Display',serif;font-size:1.5rem;color:#D4AF37;margin-top:4px}
 .panel{background:#141414;padding:22px 26px;border-radius:18px;border:1px solid rgba(255,255,255,.04);margin-bottom:20px;overflow-x:auto}
 .panel h3{font-family:'Playfair Display',serif;color:#fff;font-size:1.1rem;margin-bottom:14px;border-left:4px solid #D4AF37;padding-left:12px}
 table{width:100%;border-collapse:collapse;font-size:.8rem}
-th{text-align:left;padding:9px 6px;color:#888;font-weight:600;text-transform:uppercase;font-size:.6rem;letter-spacing:1px;border-bottom:1px solid #222}
-td{padding:9px 6px;border-bottom:1px solid #1a1a1a;vertical-align:middle}
-.badge{padding:3px 10px;border-radius:30px;font-size:.6rem;font-weight:600;text-transform:uppercase;display:inline-block}
+th{text-align:left;padding:9px 6px;color:#999;font-weight:600;text-transform:uppercase;font-size:.6rem;letter-spacing:1px;border-bottom:1px solid #222}
+td{padding:9px 6px;border-bottom:1px solid #1a1a1a;vertical-align:middle;color:#ddd}
+.badge{padding:3px 10px;border-radius:30px;font-size:.6rem;font-weight:600;text-transform:uppercase;display:inline-block;white-space:nowrap}
 .b-pending_payment{background:rgba(255,193,7,.13);color:#ffc107}
 .b-paid{background:rgba(23,162,184,.13);color:#17a2b8}
 .b-confirmed{background:rgba(40,167,69,.13);color:#28a745}
 .b-completed{background:rgba(40,167,69,.13);color:#28a745}
-.act{padding:3px 9px;border:1px solid #333;color:#aaa;background:transparent;border-radius:20px;font-size:.62rem;cursor:pointer;margin:1px}
-.act:hover{border-color:#D4AF37;color:#D4AF37}
-.act.d{border-color:#552;color:#ff4d4d}
-.act.d:hover{border-color:#ff4d4d}
-.act.pay{border-color:#D4AF37;color:#D4AF37}
-.empty{text-align:center;padding:30px 20px;color:#666}
+.act{padding:5px 12px;border:1px solid #444;color:#ddd;background:#1a1a1a;border-radius:20px;font-size:.68rem;cursor:pointer;margin:2px 2px 2px 0;white-space:nowrap;font-weight:600;display:inline-block}
+.act:hover{border-color:#D4AF37;color:#D4AF37;background:#222}
+.act.d{border-color:#663333;color:#ff6b6b}
+.act.d:hover{border-color:#ff4d4d;color:#fff;background:#ff4d4d}
+.act.pay{border-color:#D4AF37;color:#D4AF37;background:rgba(212,175,55,.1)}
+.act.pay:hover{background:#D4AF37;color:#000}
+.empty{text-align:center;padding:30px 20px;color:#888}
 .empty .ic{font-size:2.5rem;margin-bottom:8px}
 .banner{padding:12px;border-radius:10px;margin-bottom:16px;font-size:.85rem;text-align:center;display:none}
 .banner.ok{display:block;background:rgba(40,167,69,.1);border:1px solid #28a745;color:#28a745}
 .banner.err{display:block;background:rgba(255,77,77,.1);border:1px solid #ff4d4d;color:#ff4d4d}
 .hide{display:none}
 .fg{margin-bottom:12px}
-.fg label{display:block;font-size:.8rem;font-weight:600;color:#aaa;margin-bottom:4px}
+.fg label{display:block;font-size:.8rem;font-weight:600;color:#bbb;margin-bottom:4px}
 .fg input,.fg select,.fg textarea{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #2a2a2a;background:#0f0f0f;color:#fff;font-size:.9rem;outline:none;font-family:inherit}
 .fg input:focus,.fg select:focus{border-color:#D4AF37}
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(5px);z-index:1000;justify-content:center;align-items:center;padding:20px;overflow-y:auto}
 .modal.on{display:flex}
 .mbox{background:#141414;border-radius:20px;padding:28px;border:1px solid rgba(212,175,55,.2);max-width:520px;width:100%;position:relative;max-height:95vh;overflow-y:auto}
 .close{position:absolute;top:12px;right:16px;background:none;border:none;color:#888;font-size:1.8rem;cursor:pointer}
+.close:hover{color:#fff}
 .mbox h2{font-family:'Playfair Display',serif;color:#fff;font-size:1.4rem;margin-bottom:6px}
-.mbox p.sub{color:#888;font-size:.85rem;margin-bottom:18px}
+.mbox p.sub{color:#999;font-size:.85rem;margin-bottom:18px}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
-.row input,.row select{padding:8px 12px;border-radius:10px;border:1px solid #2a2a2a;background:#0f0f0f;color:#fff;font-size:.85rem}
+.row input,.row select{padding:10px 14px;border-radius:10px;border:1px solid #2a2a2a;background:#0f0f0f;color:#fff;font-size:.85rem}
 .row input:focus,.row select:focus{border-color:#D4AF37;outline:none}
-@media(max-width:600px){.panel{padding:16px}}
+.row .btn{padding:10px 18px}
+@media(max-width:600px){.panel{padding:16px}.act{font-size:.62rem;padding:4px 9px}}
 </style>
 </head>
 <body>
