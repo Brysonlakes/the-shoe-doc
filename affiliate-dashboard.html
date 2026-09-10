@@ -120,13 +120,14 @@ function load(){
 
   setBanner('⏳ Loading dashboard for '+current.email+'...','info');
 
-  db.from('affiliates').select('*').eq('email',current.email).then(function(r){
+    var emailLower=(current.email||'').trim().toLowerCase();
+  db.from('affiliates').select('*').ilike('email',emailLower).then(function(r){
     if(r.error){
       setBanner('❌ Supabase error: '+r.error.message,'err');
       return;
     }
     if(!r.data||r.data.length===0){
-      setBanner('❌ No affiliate found for '+current.email+'. Please register again.','err');
+      setBanner('❌ No affiliate found for '+emailLower+'. Please register again.','err');
       return;
     }
     var a=r.data[0];
