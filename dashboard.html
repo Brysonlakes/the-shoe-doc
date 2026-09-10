@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>THE SHOE DOC · My Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#E0E0E0;min-height:100vh;padding:24px}
+.wrap{max-width:900px;margin:0 auto}
+.head{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:30px;flex-wrap:wrap;gap:12px}
+.head h1{font-family:'Playfair Display',serif;font-size:1.5rem;color:#fff}
+.gold{background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.btn{padding:8px 20px;border:1px solid #333;border-radius:30px;background:transparent;color:#aaa;cursor:pointer;font-weight:500;text-decoration:none;font-size:.9rem;display:inline-block}
+.btn:hover{border-color:#D4AF37;color:#D4AF37}
+.welcome{background:#141414;padding:24px 28px;border-radius:16px;border:1px solid rgba(212,175,55,.1);margin-bottom:24px}
+.welcome h2{font-family:'Playfair Display',serif;font-size:1.3rem;color:#fff}
+.welcome h2 span{color:#D4AF37}
+.welcome p{color:#888;margin-top:4px;font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:24px}
+.stat{background:#141414;padding:16px 20px;border-radius:12px;border:1px solid rgba(255,255,255,.04);text-align:center}
+.stat .lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:#666}
+.stat .val{font-family:'Playfair Display',serif;font-size:1.6rem;color:#D4AF37;margin-top:4px}
+.panel{background:#141414;border-radius:16px;padding:20px;border:1px solid rgba(255,255,255,.04);overflow-x:auto;margin-bottom:20px}
+.panel h3{font-family:'Playfair Display',serif;color:#fff;font-size:1.1rem;margin-bottom:14px;border-left:4px solid #D4AF37;padding-left:12px}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{text-align:left;padding:10px 8px;color:#888;font-weight:600;text-transform:uppercase;font-size:.65rem;letter-spacing:1px;border-bottom:1px solid #222}
+td{padding:10px 8px;border-bottom:1px solid #1a1a1a}
+.badge{padding:3px 12px;border-radius:30px;font-size:.65rem;font-weight:600;text-transform:uppercase;display:inline-block}
+.b-pending_payment{background:rgba(255,193,7,.13);color:#ffc107}
+.b-paid{background:rgba(23,162,184,.13);color:#17a2b8}
+.b-confirmed{background:rgba(40,167,69,.13);color:#28a745}
+.b-completed{background:rgba(40,167,69,.13);color:#28a745}
+.empty{text-align:center;padding:36px 20px;color:#666}
+.empty .ic{font-size:3rem;margin-bottom:12px}
+.empty a{color:#D4AF37;text-decoration:none}
+.aff{background:#141414;border-radius:16px;padding:20px;border:1px solid rgba(212,175,55,.1)}
+.aff h3{font-family:'Playfair Display',serif;color:#fff;margin-bottom:8px}
+.aff p{color:#888;font-size:.9rem;margin-bottom:12px}
+.banner{padding:14px;border-radius:12px;margin-bottom:20px;font-size:.9rem;text-align:center}
+.banner.info{background:rgba(23,162,184,.1);border:1px solid #17a2b8;color:#17a2b8}
+.banner.err{background:rgba(255,77,77,.1);border:1px solid #ff4d4d;color:#ff4d4d}
+.banner.ok{background:rgba(40,167,69,.1);border:1px solid #28a745;color:#28a745}
+@media(max-width:480px){.head h1{font-size:1.1rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="head">
+<h1>👟 <span class="gold">THE SHOE DOC</span></h1>
+<a href="index.html" class="btn" onclick="logout()">🚪 Logout</a>
+</div>
+
+<div id="banner" class="banner info">⏳ Loading...</div>
+
+<div id="content" style="display:none">
+<div class="welcome">
+<h2>Welcome, <span id="cName">Customer</span> 👋</h2>
+<p>Here's your booking history and account overview.</p>
+</div>
+
+<div class="grid">
+<div class="stat"><div class="lbl">Total Bookings</div><div class="val" id="sBook">0</div></div>
+<div class="stat"><div class="lbl">Total Pairs</div><div class="val" id="sPairs">0</div></div>
+<div class="stat"><div class="lbl">Completed</div><div class="val" id="sDone">0</div></div>
+<div class="stat"><div class="lbl">Total Spent</div><div class="val" id="sSpent">R0</div></div>
+</div>
+
+<div class="grid">
+<div class="stat"><div class="lbl">🏆 Points</div><div class="val" id="sPoints">0</div></div>
+<div class="stat"><div class="lbl">💰 Value</div><div class="val" id="sValue">R0</div></div>
+<div class="stat"><div class="lbl">📈 Earned</div><div class="val" id="sEarned">0</div></div>
+</div>
+
+<div class="panel">
+<h3>📋 Your Booking History</h3>
+<div id="bookList"></div>
+</div>
+
+<div class="aff">
+<h3>💰 Become an Affiliate</h3>
+<p>Earn R20 per pair you refer. Start earning today!</p>
+<a href="affiliate-register.html" class="btn" style="border-color:#D4AF37;color:#D4AF37">Become an Affiliate</a>
+</div>
+</div>
+</div>
+
+<script>
+var SB_URL='https://nvrsiiwkdsqgtsaokubn.supabase.co';
+var SB_KEY='sb_publishable_yiBiiJvpawWZSw1pzVBPLg_gU3-JNJp';
+var db=window.supabase.createClient(SB_URL,SB_KEY);
+
+function logout(){
+  localStorage.removeItem('currentCustomer');
+  location.href='index.html';
+}
+
+function setBanner(t,cls){
+  var b=document.getElementById('banner');
+  b.textContent=t;
+  b.className='banner '+cls;
+}
+
+function load(){
+  var stored=localStorage.getItem('currentCustomer');
+  if(!stored){setBanner('❌ Not logged in. Go back to login.','err');return;}
+
+  var current;
+  try{current=JSON.parse(stored);}catch(e){
+    setBanner('❌ Corrupt session. Please login again.','err');
+    return;
+  }
+
+  setBanner('⏳ Loading your dashboard...','info');
+
+  // Get customer record
+  db.from('customers').select('*').eq('email',current.email).then(function(r){
+    if(r.error){setBanner('❌ Error: '+r.error.message,'err');return;}
+    if(!r.data||r.data.length===0){
+      setBanner('❌ No customer found. Please register.','err');
+      return;
+    }
+    var cust=r.data[0];
+    document.getElementById('content').style.display='block';
+    document.getElementById('cName').textContent=cust.name||'Customer';
+    setBanner('✅ Logged in as '+cust.email,'ok');
+
+    // Get bookings
+    db.from('bookings').select('*').eq('email',cust.email).order('created_at',{ascending:false}).then(function(b){
+      var bookings=b.data||[];
+      var totalBookings=bookings.length;
+      var totalPairs=0, done=0, spent=0;
+      for(var i=0;i<bookings.length;i++){
+        totalPairs+=bookings[i].total_pairs||1;
+        if(bookings[i].status==='completed')done++;
+        spent+=Number(bookings[i].total_due)||0;
+      }
+      document.getElementById('sBook').textContent=totalBookings;
+      document.getElementById('sPairs').textContent=totalPairs;
+      document.getElementById('sDone').textContent=done;
+      document.getElementById('sSpent').textContent='R'+spent;
+
+      if(bookings.length===0){
+        document.getElementById('bookList').innerHTML='<div class="empty"><div class="ic">📭</div><p>You haven\'t made any bookings yet.</p><p style="margin-top:6px"><a href="booking.html">Book your first cleaning now!</a></p></div>';
+      }else{
+        var html='<table><thead><tr><th>Invoice</th><th>Services</th><th>Pairs</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead><tbody>';
+        for(var j=0;j<bookings.length;j++){
+          var bk=bookings[j];
+          var st=bk.status||'pending_payment';
+          var stLabel=st.charAt(0).toUpperCase()+st.slice(1).replace('_',' ');
+          html+='<tr>'+
+                '<td><strong>'+(bk.invoice||'')+'</strong></td>'+
+                '<td>'+(bk.services_list||'N/A')+'</td>'+
+                '<td>'+(bk.total_pairs||1)+'</td>'+
+                '<td>'+(bk.date||'')+'</td>'+
+                '<td>R'+(bk.total_due||0)+'</td>'+
+                '<td><span class="badge b-'+st+'">'+stLabel+'</span></td>'+
+                '</tr>';
+        }
+        html+='</tbody></table>';
+        document.getElementById('bookList').innerHTML=html;
+      }
+
+      // Rewards
+      db.from('rewards').select('*').eq('email',cust.email).then(function(rr){
+        var rw=(rr.data&&rr.data[0])||{points:0,total_earned:0};
+        document.getElementById('sPoints').textContent=rw.points||0;
+        document.getElementById('sValue').textContent='R'+(Math.floor((rw.points||0)/10)*5);
+        document.getElementById('sEarned').textContent=rw.total_earned||0;
+      });
+    });
+  });
+}
+
+load();
+</script>
+</body>
+</html>
