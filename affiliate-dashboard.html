@@ -31,6 +31,7 @@ th{text-align:left;padding:10px 8px;color:#888;font-weight:600;text-transform:up
 td{padding:10px 8px;border-bottom:1px solid #1a1a1a}
 .empty{text-align:center;padding:30px 20px;color:#666}
 .empty .ic{font-size:2.5rem;margin-bottom:8px}
+.loading{text-align:center;padding:40px;color:#888}
 @media(max-width:480px){.head h1{font-size:1.1rem}.panel{padding:20px 16px}}
 </style>
 </head>
@@ -44,6 +45,9 @@ td{padding:10px 8px;border-bottom:1px solid #1a1a1a}
 </div>
 </div>
 
+<div id="loading" class="loading">⏳ Loading your dashboard...</div>
+
+<div id="main" style="display:none">
 <div class="grid">
 <div class="stat"><div class="lbl">Total Earnings</div><div class="val" id="sEarn">R0</div></div>
 <div class="stat"><div class="lbl">Balance</div><div class="val" id="sBal">R0</div></div>
@@ -75,6 +79,7 @@ td{padding:10px 8px;border-bottom:1px solid #1a1a1a}
 <div id="bankBox"></div>
 </div>
 </div>
+</div>
 
 <script>
 var SB_URL='https://nvrsiiwkdsqgtsaokubn.supabase.co';
@@ -95,16 +100,21 @@ function copyCode(){
 
 function load(){
   var stored=localStorage.getItem('currentAffiliate');
-  if(!stored){location.href='index.html';return;}
+  if(!stored){
+    document.getElementById('loading').innerHTML='❌ Not logged in. <a href="index.html" style="color:#D4AF37">Login here</a>';
+    return;
+  }
   var current=JSON.parse(stored);
 
-  // Get latest affiliate data from Supabase
-  db.from('affiliates').select('*').eq('id',current.id).then(function(r){
+  // Look up by email (more reliable than id)
+  db.from('affiliates').select('*').eq('email',current.email).then(function(r){
     if(!r.data || r.data.length===0){
-      location.href='index.html';
+      document.getElementById('loading').innerHTML='❌ Affiliate not found. <a href="affiliate-register.html" style="color:#D4AF37">Register here</a>';
       return;
     }
     var a=r.data[0];
+    document.getElementById('loading').style.display='none';
+    document.getElementById('main').style.display='block';
 
     document.getElementById('sEarn').textContent='R'+(a.total_earned||0);
     document.getElementById('sBal').textContent='R'+(a.balance||0);
@@ -114,7 +124,7 @@ function load(){
       '<p><strong>Bank:</strong> '+(a.bank_name||'Not set')+'</p>'+
       '<p style="margin-top:6px"><strong>Account:</strong> '+(a.account_number||'Not set')+'</p>';
 
-    // Load referrals (bookings with this affiliate code)
+    // Load referrals
     db.from('bookings').select('*').eq('affiliate_code',a.affiliate_code).then(function(b){
       var bookings=b.data||[];
       document.getElementById('sRef').textContent=bookings.length;
@@ -136,7 +146,7 @@ function load(){
         document.getElementById('refList').innerHTML=html;
       }
 
-      // Load downline
+      // Downline
       var down=a.downline||[];
       document.getElementById('sDown').textContent=down.length;
 
@@ -149,20 +159,19 @@ function load(){
             document.getElementById('downList').innerHTML='<div class="empty"><div class="ic">👤</div><p>No downline affiliates yet.</p></div>';
             return;
           }
-          var html2='<table><thead><tr><th>Name</th><th>Email</th><th>Code</th><th>Status</th></tr></thead><tbody>';
+          var h2='<table><thead><tr><th>Name</th><th>Email</th><th>Code</th><th>Status</th></tr></thead><tbody>';
           for(var j=0;j<list.length;j++){
             var x=list[j];
-            html2+='<tr><td><strong>'+x.name+'</strong></td>'+
-                   '<td>'+x.email+'</td>'+
-                   '<td>'+x.affiliate_code+'</td>'+
-                   '<td style="color:'+(x.status==='active'?'#28a745':'#ffc107')+'">'+x.status+'</td></tr>';
+            h2+='<tr><td><strong>'+x.name+'</strong></td>'+
+                '<td>'+x.email+'</td>'+
+                '<td>'+x.affiliate_code+'</td>'+
+                '<td style="color:'+(x.status==='active'?'#28a745':'#ffc107')+'">'+x.status+'</td></tr>';
           }
-          html2+='</tbody></table>';
-          document.getElementById('downList').innerHTML=html2;
+          h2+='</tbody></table>';
+          document.getElementById('downList').innerHTML=h2;
         });
       }
 
-      // Update stored data
       localStorage.setItem('currentAffiliate',JSON.stringify(a));
     });
   });
