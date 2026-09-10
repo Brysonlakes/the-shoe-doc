@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>THE SHOE DOC · Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#E0E0E0;min-height:100vh;padding:20px}
+.wrap{max-width:1200px;margin:0 auto}
+.head{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.05);margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.head h1{font-family:'Playfair Display',serif;font-size:1.5rem;color:#fff}
+.gold{background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.btn{padding:8px 20px;border:1px solid #333;border-radius:30px;background:transparent;color:#aaa;cursor:pointer;font-weight:500;text-decoration:none;font-size:.9rem;display:inline-block}
+.btn:hover{border-color:#D4AF37;color:#D4AF37}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;border-bottom:1px solid #222;padding-bottom:8px}
+.tabs button{padding:8px 18px;border:none;border-radius:30px;background:transparent;color:#888;font-weight:600;font-size:.85rem;cursor:pointer}
+.tabs button.active{background:rgba(212,175,55,.15);color:#D4AF37}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:24px}
+.stat{background:#141414;padding:16px 20px;border-radius:14px;border:1px solid rgba(255,255,255,.04)}
+.stat .lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:1px;color:#666}
+.stat .val{font-family:'Playfair Display',serif;font-size:1.6rem;color:#D4AF37;margin-top:4px}
+.panel{background:#141414;padding:22px 26px;border-radius:18px;border:1px solid rgba(255,255,255,.04);margin-bottom:20px;overflow-x:auto}
+.panel h3{font-family:'Playfair Display',serif;color:#fff;font-size:1.15rem;margin-bottom:14px;border-left:4px solid #D4AF37;padding-left:12px}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{text-align:left;padding:10px 8px;color:#888;font-weight:600;text-transform:uppercase;font-size:.62rem;letter-spacing:1px;border-bottom:1px solid #222}
+td{padding:10px 8px;border-bottom:1px solid #1a1a1a;vertical-align:middle}
+.badge{padding:3px 12px;border-radius:30px;font-size:.62rem;font-weight:600;text-transform:uppercase;display:inline-block}
+.b-pending_payment{background:rgba(255,193,7,.13);color:#ffc107}
+.b-paid{background:rgba(23,162,184,.13);color:#17a2b8}
+.b-confirmed{background:rgba(40,167,69,.13);color:#28a745}
+.b-completed{background:rgba(40,167,69,.13);color:#28a745}
+.b-unpaid{background:rgba(255,77,77,.13);color:#ff4d4d}
+.act{padding:3px 10px;border:1px solid #333;color:#aaa;background:transparent;border-radius:20px;font-size:.68rem;cursor:pointer;margin:1px}
+.act:hover{border-color:#D4AF37;color:#D4AF37}
+.act.d{border-color:#552;color:#ff4d4d}
+.act.d:hover{border-color:#ff4d4d}
+.empty{text-align:center;padding:30px 20px;color:#666}
+.empty .ic{font-size:2.5rem;margin-bottom:8px}
+.banner{padding:12px;border-radius:10px;margin-bottom:16px;font-size:.85rem;text-align:center;display:none}
+.banner.ok{display:block;background:rgba(40,167,69,.1);border:1px solid #28a745;color:#28a745}
+.banner.err{display:block;background:rgba(255,77,77,.1);border:1px solid #ff4d4d;color:#ff4d4d}
+.hide{display:none}
+@media(max-width:600px){.panel{padding:16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="head">
+<h1>👑 <span class="gold">THE SHOE DOC</span> · Admin</h1>
+<a href="index.html" class="btn" onclick="logout()">🚪 Logout</a>
+</div>
+
+<div id="banner" class="banner"></div>
+
+<div class="tabs">
+<button class="active" data-tab="dash" onclick="switchTab('dash')">📊 Dashboard</button>
+<button data-tab="bookings" onclick="switchTab('bookings')">📦 Bookings</button>
+<button data-tab="affiliates" onclick="switchTab('affiliates')">🤝 Affiliates</button>
+<button data-tab="customers" onclick="switchTab('customers')">👥 Customers</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="tab-dash">
+<div class="grid">
+<div class="stat"><div class="lbl">Total Bookings</div><div class="val" id="dBook">0</div></div>
+<div class="stat"><div class="lbl">Total Pairs</div><div class="val" id="dPairs">0</div></div>
+<div class="stat"><div class="lbl">Revenue</div><div class="val" id="dRev">R0</div></div>
+<div class="stat"><div class="lbl">Customers</div><div class="val" id="dCust">0</div></div>
+<div class="stat"><div class="lbl">Affiliates</div><div class="val" id="dAff">0</div></div>
+</div>
+</div>
+
+<!-- BOOKINGS -->
+<div id="tab-bookings" class="hide">
+<div class="panel">
+<h3>📦 All Bookings</h3>
+<div id="bookBox"></div>
+</div>
+</div>
+
+<!-- AFFILIATES -->
+<div id="tab-affiliates" class="hide">
+<div class="panel">
+<h3>🤝 All Affiliates</h3>
+<div id="affBox"></div>
+</div>
+</div>
+
+<!-- CUSTOMERS -->
+<div id="tab-customers" class="hide">
+<div class="panel">
+<h3>👥 All Customers</h3>
+<div id="custBox"></div>
+</div>
+</div>
+</div>
+
+<script>
+var SB_URL='https://nvrsiiwkdsqgtsaokubn.supabase.co';
+var SB_KEY='sb_publishable_yiBiiJvpawWZSw1pzVBPLg_gU3-JNJp';
+var db=window.supabase.createClient(SB_URL,SB_KEY);
+
+var allBookings=[];
+var allAffiliates=[];
+var allCustomers=[];
+
+function logout(){localStorage.removeItem('currentCustomer');localStorage.removeItem('currentAffiliate');location.href='index.html';}
+
+function banner(t,cls){
+  var b=document.getElementById('banner');
+  if(!t){b.style.display='none';return;}
+  b.textContent=t;
+  b.className='banner '+cls;
+  b.style.display='block';
+  if(cls==='ok')setTimeout(function(){b.style.display='none';},2500);
+}
+
+function switchTab(t){
+  var tabs=document.querySelectorAll('.tabs button');
+  for(var i=0;i<tabs.length;i++)tabs[i].classList.toggle('active',tabs[i].dataset.tab===t);
+  ['dash','bookings','affiliates','customers'].forEach(function(x){
+    document.getElementById('tab-'+x).classList.toggle('hide',x!==t);
+  });
+  if(t==='bookings')renderBookings();
+  if(t==='affiliates')renderAffiliates();
+  if(t==='customers')renderCustomers();
+}
+
+function loadAll(){
+  banner('⏳ Loading data from Supabase...','ok');
+
+  db.from('bookings').select('*').order('created_at',{ascending:false}).then(function(r){
+    allBookings=r.data||[];
+    if(r.error){banner('❌ Bookings error: '+r.error.message,'err');return;}
+
+    var totalPairs=0,rev=0;
+    allBookings.forEach(function(b){totalPairs+=b.total_pairs||1;rev+=Number(b.total_due)||0;});
+    document.getElementById('dBook').textContent=allBookings.length;
+    document.getElementById('dPairs').textContent=totalPairs;
+    document.getElementById('dRev').textContent='R'+rev;
+
+    banner('✅ Data loaded','ok');
+
+    db.from('customers').select('*').then(function(c){
+      allCustomers=c.data||[];
+      document.getElementById('dCust').textContent=allCustomers.length;
+    });
+
+    db.from('affiliates').select('*').then(function(a){
+      allAffiliates=a.data||[];
+      document.getElementById('dAff').textContent=allAffiliates.length;
+    });
+  });
+}
+
+function renderBookings(){
+  var box=document.getElementById('bookBox');
+  if(allBookings.length===0){box.innerHTML='<div class="empty"><div class="ic">📭</div><p>No bookings yet.</p></div>';return;}
+  var h='<table><thead><tr><th>Invoice</th><th>Customer</th><th>Services</th><th>Pairs</th><th>Date</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+  allBookings.forEach(function(b){
+    var st=b.status||'pending_payment';
+    var stLabel=st.charAt(0).toUpperCase()+st.slice(1).replace('_',' ');
+    h+='<tr>'+
+      '<td><strong>'+(b.invoice||'')+'</strong></td>'+
+      '<td>'+(b.customer||'')+'<br><span style="font-size:.7rem;color:#666">'+(b.phone||'')+'</span></td>'+
+      '<td>'+(b.services_list||'N/A')+'</td>'+
+      '<td>'+(b.total_pairs||1)+'</td>'+
+      '<td>'+(b.date||'')+'<br><span style="font-size:.7rem;color:#666">'+(b.time||'')+'</span></td>'+
+      '<td>R'+(b.total_due||0)+'</td>'+
+      '<td><span class="badge b-'+st+'">'+stLabel+'</span></td>'+
+      '<td>'+
+        '<button class="act" onclick="setStatus('+b.id+',\'confirmed\')">Confirm</button>'+
+        '<button class="act" onclick="setStatus('+b.id+',\'completed\')">Complete</button>'+
+        '<button class="act d" onclick="delBooking('+b.id+')">🗑️</button>'+
+      '</td></tr>';
+  });
+  h+='</tbody></table>';
+  box.innerHTML=h;
+}
+
+function renderAffiliates(){
+  var box=document.getElementById('affBox');
+  if(allAffiliates.length===0){box.innerHTML='<div class="empty"><div class="ic">👤</div><p>No affiliates yet.</p></div>';return;}
+  var h='<table><thead><tr><th>Name</th><th>Email</th><th>Code</th><th>Bank</th><th>Balance</th><th>Earned</th><th>Status</th></tr></thead><tbody>';
+  allAffiliates.forEach(function(a){
+    h+='<tr>'+
+      '<td><strong>'+(a.name||'')+'</strong></td>'+
+      '<td>'+(a.email||'')+'</td>'+
+      '<td style="color:#D4AF37;font-weight:700">'+(a.affiliate_code||'')+'</td>'+
+      '<td>'+(a.bank_name||'-')+'</td>'+
+      '<td>R'+(a.balance||0)+'</td>'+
+      '<td>R'+(a.total_earned||0)+'</td>'+
+      '<td>'+(a.status||'active')+'</td>'+
+      '</tr>';
+  });
+  h+='</tbody></table>';
+  box.innerHTML=h;
+}
+
+function renderCustomers(){
+  var box=document.getElementById('custBox');
+  if(allCustomers.length===0){box.innerHTML='<div class="empty"><div class="ic">👤</div><p>No customers yet.</p></div>';return;}
+  var h='<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th></tr></thead><tbody>';
+  allCustomers.forEach(function(c){
+    h+='<tr>'+
+      '<td><strong>'+(c.name||'')+'</strong></td>'+
+      '<td>'+(c.email||'')+'</td>'+
+      '<td>'+(c.phone||'')+'</td>'+
+      '<td>'+(c.created_at||'').substring(0,10)+'</td>'+
+      '</tr>';
+  });
+  h+='</tbody></table>';
+  box.innerHTML=h;
+}
+
+function setStatus(id,status){
+  db.from('bookings').update({status:status}).eq('id',id).then(function(r){
+    if(r.error){banner('❌ '+r.error.message,'err');return;}
+    banner('✅ Status updated to '+status,'ok');
+    loadAll();
+  });
+}
+
+function delBooking(id){
+  if(!confirm('Delete this booking?'))return;
+  db.from('bookings').delete().eq('id',id).then(function(r){
+    if(r.error){banner('❌ '+r.error.message,'err');return;}
+    banner('🗑️ Booking deleted','ok');
+    loadAll();
+  });
+}
+
+loadAll();
+</script>
+</body>
+</html>
