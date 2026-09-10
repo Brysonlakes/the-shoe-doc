@@ -1,291 +1,183 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>THE SHOE DOC · Become an Affiliate</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; }
-        :root {
-            --gold: #D4AF37;
-            --gold-light: #F9D976;
-            --gold-gradient: linear-gradient(135deg, #F9D976 0%, #D4AF37 50%, #B8860B 100%);
-            --gold-glow: 0 0 30px rgba(212,175,55,0.3);
-            --dark-bg: #0A0A0A;
-            --dark-card: #141414;
-            --dark-surface: #1A1A1A;
-            --white: #FFFFFF;
-            --off-white: #E0E0E0;
-            --font-serif: 'Playfair Display', serif;
-            --font-sans: 'Inter', sans-serif;
-        }
-        body { font-family:var(--font-sans); background:var(--dark-bg); color:var(--off-white); min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
-        .register-wrapper { width:100%; max-width:480px; }
-        .register-card { background:var(--dark-card); border-radius:24px; padding:40px 32px; border:1px solid rgba(212,175,55,0.15); box-shadow:0 20px 60px rgba(0,0,0,0.8); }
-        .register-header { text-align:center; margin-bottom:32px; }
-        .register-header .logo { font-family:var(--font-serif); font-size:2rem; font-weight:700; background:var(--gold-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-        .register-header .subtitle { color:#888; font-size:0.9rem; margin-top:4px; }
-        .form-group { margin-bottom:16px; }
-        .form-group label { display:block; font-size:0.85rem; font-weight:600; color:#aaa; margin-bottom:4px; }
-        .form-group input { width:100%; padding:12px 16px; border-radius:12px; border:1px solid #2a2a2a; background:#0f0f0f; color:#fff; font-size:1rem; font-family:var(--font-sans); transition:0.3s; outline:none; }
-        .form-group input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,0.15); }
-        .form-group input::placeholder { color:#555; }
-        .btn-register { width:100%; padding:14px; border:none; border-radius:50px; font-weight:700; font-size:1.05rem; background:var(--gold-gradient); color:#000; cursor:pointer; transition:0.3s; }
-        .btn-register:hover { transform:scale(1.02); box-shadow:var(--gold-glow); }
-        .error-msg { color:#ff4d4d; font-size:0.85rem; margin-top:12px; text-align:center; display:none; }
-        .error-msg.show { display:block; }
-        .success-msg { color:#28a745; font-size:0.85rem; margin-top:12px; text-align:center; display:none; }
-        .success-msg.show { display:block; }
-        .login-footer { text-align:center; margin-top:20px; color:#666; font-size:0.8rem; }
-        .login-footer a { color:var(--gold); text-decoration:none; }
-        .login-footer a:hover { text-decoration:underline; }
-        .commission-info { background:rgba(212,175,55,0.05); border:1px solid rgba(212,175,55,0.1); border-radius:12px; padding:16px; margin-bottom:20px; }
-        .commission-info h4 { color:var(--gold); margin-bottom:8px; font-family:var(--font-serif); }
-        .commission-info ul { list-style:none; color:#888; font-size:0.9rem; }
-        .commission-info ul li { padding:4px 0; display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.03); }
-        .commission-info ul li:last-child { border-bottom:none; }
-        .commission-info ul li strong { color:var(--gold); }
-        @media (max-width:480px) { .register-card { padding:28px 20px; } .register-header .logo { font-size:1.6rem; } }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>THE SHOE DOC · Become an Affiliate</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#E0E0E0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.box{background:#141414;border-radius:24px;padding:40px 32px;border:1px solid rgba(212,175,55,.15);width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.logo{font-family:'Playfair Display',serif;font-size:2rem;text-align:center;background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.sub{color:#888;text-align:center;font-size:.9rem;margin-bottom:24px}
+.info{background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.15);border-radius:12px;padding:16px;margin-bottom:20px}
+.info h4{color:#D4AF37;margin-bottom:8px;font-size:.95rem}
+.info ul{list-style:none;color:#aaa;font-size:.85rem}
+.info li{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.info li:last-child{border-bottom:none}
+.info li strong{color:#D4AF37}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:.85rem;font-weight:600;color:#aaa;margin-bottom:4px}
+.fg input{width:100%;padding:12px 16px;border-radius:12px;border:1px solid #2a2a2a;background:#0f0f0f;color:#fff;font-size:1rem;outline:none;font-family:inherit}
+.fg input:focus{border-color:#D4AF37}
+.btn{width:100%;padding:14px;border:none;border-radius:50px;font-weight:700;font-size:1rem;background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);color:#000;cursor:pointer;margin-top:8px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(212,175,55,.3)}
+.msg{margin-top:12px;font-size:.85rem;text-align:center;display:none;padding:10px;border-radius:8px}
+.msg.err{display:block;color:#ff4d4d;background:rgba(255,77,77,.1)}
+.msg.ok{display:block;color:#28a745;background:rgba(40,167,69,.1);word-break:break-all}
+.foot{text-align:center;margin-top:20px;color:#666;font-size:.8rem}
+.foot a{color:#D4AF37;text-decoration:none}
+@media(max-width:480px){.box{padding:28px 20px}}
+</style>
 </head>
 <body>
-    <div class="register-wrapper">
-        <div class="register-card">
-            <div class="register-header">
-                <div class="logo">THE SHOE DOC</div>
-                <p class="subtitle">💰 Become an Affiliate Marketer</p>
-            </div>
+<div class="box">
+<div class="logo">THE SHOE DOC</div>
+<p class="sub">💰 Become an Affiliate Marketer</p>
 
-            <!-- Commission Info -->
-            <div class="commission-info">
-                <h4>💰 How You Earn</h4>
-                <ul>
-                    <li><span>Basic Wash</span> <strong>R15/pair</strong></li>
-                    <li><span>Deep Clean</span> <strong>R20/pair</strong></li>
-                    <li><span>Premium Care</span> <strong>R30/pair</strong></li>
-                    <li style="border-top:1px solid rgba(255,255,255,0.05); margin-top:4px; padding-top:8px;">
-                        <span>Min Payout</span> <strong>R200</strong>
-                    </li>
-                    <li>
-                        <span>Payment Method</span> <strong>EFT</strong>
-                    </li>
-                </ul>
-            </div>
+<div class="info">
+<h4>💰 How You Earn</h4>
+<ul>
+<li><span>Basic Wash</span><strong>R15/pair</strong></li>
+<li><span>Deep Clean</span><strong>R20/pair</strong></li>
+<li><span>Premium Care</span><strong>R30/pair</strong></li>
+<li><span>Min Payout</span><strong>R200</strong></li>
+</ul>
+</div>
 
-            <form id="registerForm" onsubmit="handleRegister(event)">
-                <div class="form-group"><label>Full Name *</label><input type="text" id="regName" placeholder="e.g. Thabo M." required /></div>
-                <div class="form-group"><label>Email Address *</label><input type="email" id="regEmail" placeholder="customer@email.com" required /></div>
-                <div class="form-group"><label>Phone Number *</label><input type="tel" id="regPhone" placeholder="082 123 4567" required /></div>
-                <div class="form-group"><label>Password *</label><input type="password" id="regPassword" placeholder="Min 6 characters" required minlength="6" /></div>
-                <div class="form-group"><label>Confirm Password *</label><input type="password" id="regConfirmPassword" placeholder="Confirm password" required /></div>
-                <div class="form-group"><label>Referred By (Optional)</label><input type="text" id="regReferralCode" placeholder="Enter affiliate code if you were referred" /></div>
-                <div class="form-group"><label>Bank Name *</label><input type="text" id="regBankName" placeholder="e.g. Standard Bank" required /></div>
-                <div class="form-group"><label>Account Number *</label><input type="text" id="regAccountNumber" placeholder="1234567890" required /></div>
-                <button type="submit" class="btn-register">Become an Affiliate</button>
-                <div id="errorMsg" class="error-msg"></div>
-                <div id="successMsg" class="success-msg"></div>
-            </form>
-            <div class="login-footer">
-                <p>Already an affiliate? <a href="affiliate-dashboard.html">Login here</a></p>
-                <p style="margin-top:4px;"><a href="index.html">← Back to Main Site</a></p>
-            </div>
-        </div>
-    </div>
+<div class="fg"><label>Full Name *</label><input type="text" id="iName" placeholder="Thabo M."></div>
+<div class="fg"><label>Email *</label><input type="email" id="iEmail" placeholder="you@email.com"></div>
+<div class="fg"><label>Phone *</label><input type="tel" id="iPhone" placeholder="082 123 4567"></div>
+<div class="fg"><label>Password *</label><input type="password" id="iPass" placeholder="Min 6 characters"></div>
+<div class="fg"><label>Confirm Password *</label><input type="password" id="iPass2" placeholder="Repeat password"></div>
+<div class="fg"><label>Referred By (Optional)</label><input type="text" id="iRef" placeholder="Enter affiliate code if referred"></div>
+<div class="fg"><label>Bank Name *</label><input type="text" id="iBank" placeholder="e.g. Standard Bank"></div>
+<div class="fg"><label>Account Number *</label><input type="text" id="iAcc" placeholder="1234567890"></div>
 
-    <script>
-        function getData(key, fallback) { 
-            const data = localStorage.getItem(key); 
-            if (data) { 
-                try { return JSON.parse(data); } 
-                catch(e) { return fallback; } 
-            } 
-            return fallback; 
-        }
-        
-        function setData(key, value) { 
-            localStorage.setItem(key, JSON.stringify(value)); 
-        }
-        
-        function getAffiliates() { 
-            return getData('shoeDocAffiliates', []); 
-        }
-        
-        function generateAffiliateCode(name) {
-            const prefix = name.substring(0, 3).toUpperCase();
-            const random = Math.random().toString(36).substring(2, 6).toUpperCase();
-            return prefix + random;
-        }
+<button class="btn" onclick="doRegister()">Become an Affiliate</button>
+<div id="msg" class="msg"></div>
 
-        // ============================================================
-        // SEND EMAIL VIA FORMPREE - Using hidden iframe
-        // ============================================================
-        function sendFormspreeEmail(endpoint, data) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = endpoint;
-            form.target = 'hiddenFrame';
-            form.style.display = 'none';
-            
-            Object.keys(data).forEach(key => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = key;
-                input.value = data[key];
-                form.appendChild(input);
-            });
-            
-            document.body.appendChild(form);
-            form.submit();
-            document.body.removeChild(form);
-        }
+<div class="foot">
+<p>Already an affiliate? <a href="index.html">Login here</a></p>
+<p style="margin-top:6px"><a href="index.html">← Back to Main Site</a></p>
+</div>
+</div>
 
-        function sendAffiliateConfirmationEmail(name, email, affiliateCode) {
-            sendFormspreeEmail('https://formspree.io/f/xoeqprgy', {
-                _subject: '💰 Affiliate Registration - THE SHOE DOC',
-                to: email,
-                name: name,
-                affiliate_code: affiliateCode,
-                message: `Welcome to THE SHOE DOC affiliate program!\n\nYour affiliate code is: ${affiliateCode}\n\nShare this code with customers and earn R15-R30 per pair they book!\n\nLogin to your dashboard: https://brysonlakes.github.io/the-shoe-doc/affiliate-dashboard.html`
-            });
-        }
+<script>
+// ============ SUPABASE ============
+const SUPABASE_URL = 'https://nvrsiiwkdsqgtsaokubn.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_yiBiiJvpawWZSw1pzVBPLg_gU3-JNJp';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Create hidden iframe for form submissions
-        function createHiddenFrame() {
-            const iframe = document.createElement('iframe');
-            iframe.name = 'hiddenFrame';
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-        }
+function showMsg(text, type){
+  const m=document.getElementById('msg');
+  m.textContent=text;
+  m.className='msg '+type;
+}
 
-        // ============================================================
-        // HANDLE REGISTRATION
-        // ============================================================
-        function handleRegister(e) {
-            e.preventDefault();
-            const errorEl = document.getElementById('errorMsg');
-            const successEl = document.getElementById('successMsg');
-            errorEl.classList.remove('show');
-            successEl.classList.remove('show');
+function genCode(name){
+  const prefix=(name.substring(0,3)||'AFF').toUpperCase();
+  const rand=Math.random().toString(36).substring(2,6).toUpperCase();
+  return prefix+rand;
+}
 
-            const name = document.getElementById('regName').value.trim();
-            const email = document.getElementById('regEmail').value.trim();
-            const phone = document.getElementById('regPhone').value.trim();
-            const password = document.getElementById('regPassword').value;
-            const confirm = document.getElementById('regConfirmPassword').value;
-            const referralCode = document.getElementById('regReferralCode').value.trim().toUpperCase();
-            const bankName = document.getElementById('regBankName').value.trim();
-            const accountNumber = document.getElementById('regAccountNumber').value.trim();
+async function doRegister(){
+  const name=document.getElementById('iName').value.trim();
+  const email=document.getElementById('iEmail').value.trim();
+  const phone=document.getElementById('iPhone').value.trim();
+  const pass=document.getElementById('iPass').value;
+  const pass2=document.getElementById('iPass2').value;
+  const ref=document.getElementById('iRef').value.trim().toUpperCase();
+  const bank=document.getElementById('iBank').value.trim();
+  const acc=document.getElementById('iAcc').value.trim();
 
-            // Validation
-            if (!name || !email || !phone || !password || !confirm || !bankName || !accountNumber) {
-                errorEl.textContent = '❌ Please fill in all required fields.';
-                errorEl.classList.add('show'); 
-                return;
-            }
-            if (password.length < 6) { 
-                errorEl.textContent = '❌ Password must be at least 6 characters.';
-                errorEl.classList.add('show'); 
-                return; 
-            }
-            if (password !== confirm) { 
-                errorEl.textContent = '❌ Passwords do not match.';
-                errorEl.classList.add('show'); 
-                return; 
-            }
+  if(!name||!email||!phone||!pass||!pass2||!bank||!acc){
+    showMsg('❌ Please fill in all required fields','err');return;
+  }
+  if(pass.length<6){
+    showMsg('❌ Password must be at least 6 characters','err');return;
+  }
+  if(pass!==pass2){
+    showMsg('❌ Passwords do not match','err');return;
+  }
 
-            // Get existing affiliates
-            let affiliates = getAffiliates();
-            
-            // Check if email already exists
-            if (affiliates.some(a => a.email && a.email.toLowerCase() === email.toLowerCase())) {
-                errorEl.textContent = '❌ This email is already registered.';
-                errorEl.classList.add('show'); 
-                return;
-            }
+  // Check if email exists
+  const existing=await sb.from('affiliates').select('email').eq('email',email);
+  if(existing.data && existing.data.length>0){
+    showMsg('❌ This email is already registered','err');return;
+  }
 
-            // Check referral code
-            let referredBy = null;
-            if (referralCode) {
-                const referrer = affiliates.find(a => a.affiliate_code === referralCode);
-                if (!referrer) { 
-                    errorEl.textContent = '❌ Invalid referral code.';
-                    errorEl.classList.add('show'); 
-                    return; 
-                }
-                referredBy = referrer.id;
-            }
+  // Check referral code
+  let referredBy=null;
+  if(ref){
+    const r=await sb.from('affiliates').select('id').eq('affiliate_code',ref);
+    if(!r.data || r.data.length===0){
+      showMsg('❌ Invalid referral code','err');return;
+    }
+    referredBy=r.data[0].id;
+  }
 
-            // Generate affiliate code
-            const affiliateCode = generateAffiliateCode(name);
-            
-            const newAffiliate = {
-                id: Date.now(),
-                name: name,
-                email: email,
-                phone: phone,
-                password: password,
-                affiliate_code: affiliateCode,
-                referred_by: referredBy,
-                bank_name: bankName,
-                account_number: accountNumber,
-                balance: 0,
-                total_earned: 0,
-                referrals: [],
-                downline: [],
-                status: 'active',
-                created_at: new Date().toISOString(),
-                last_login: null
-            };
+  const code=genCode(name);
+  const newAff={
+    id:Date.now(),
+    name:name,
+    email:email,
+    phone:phone,
+    password:pass,
+    affiliate_code:code,
+    referred_by:referredBy,
+    bank_name:bank,
+    account_number:acc,
+    balance:0,
+    total_earned:0,
+    referrals:[],
+    downline:[],
+    status:'active'
+  };
 
-            // Save affiliate
-            affiliates.push(newAffiliate);
-            setData('shoeDocAffiliates', affiliates);
+  const result=await sb.from('affiliates').insert([newAff]).select();
+  if(result.error){
+    showMsg('❌ Error: '+result.error.message,'err');
+    return;
+  }
 
-            // Add to referrer's downline
-            if (referredBy) {
-                const referrer = affiliates.find(a => a.id === referredBy);
-                if (referrer && !referrer.downline.includes(newAffiliate.id)) {
-                    referrer.downline.push(newAffiliate.id);
-                    setData('shoeDocAffiliates', affiliates);
-                }
-            }
+  // Add to referrer's downline
+  if(referredBy){
+    const r2=await sb.from('affiliates').select('downline').eq('id',referredBy);
+    if(r2.data && r2.data.length>0){
+      const down=r2.data[0].downline||[];
+      down.push(newAff.id);
+      await sb.from('affiliates').update({downline:down}).eq('id',referredBy);
+    }
+  }
 
-            // Send confirmation email via Formspree
-            sendAffiliateConfirmationEmail(name, email, affiliateCode);
+  // Send welcome email
+  sendMail('https://formspree.io/f/xoeqprgy',{
+    _subject:'💰 Affiliate Registration - THE SHOE DOC',
+    to:email,
+    name:name,
+    affiliate_code:code
+  });
 
-            // Update analytics
-            let analytics = getData('shoeDocAnalytics', { visitors: 0, registrations: 0, bookings: 0 });
-            analytics.registrations = (analytics.registrations || 0) + 1;
-            setData('shoeDocAnalytics', analytics);
+  showMsg('✅ Welcome '+name+'! Your code: '+code+' — Redirecting...','ok');
+  localStorage.setItem('currentAffiliate',JSON.stringify(newAff));
+  setTimeout(()=>{location.href='affiliate-dashboard.html';},2500);
+}
 
-            // Show success message
-            successEl.textContent = `✅ Registration successful! Your affiliate code is: ${affiliateCode}`;
-            successEl.classList.add('show');
-
-            // Clear form
-            document.getElementById('regName').value = '';
-            document.getElementById('regEmail').value = '';
-            document.getElementById('regPhone').value = '';
-            document.getElementById('regPassword').value = '';
-            document.getElementById('regConfirmPassword').value = '';
-            document.getElementById('regReferralCode').value = '';
-            document.getElementById('regBankName').value = '';
-            document.getElementById('regAccountNumber').value = '';
-
-            // Save current affiliate and redirect
-            localStorage.setItem('currentAffiliate', JSON.stringify(newAffiliate));
-            
-            setTimeout(() => { 
-                window.location.href = 'affiliate-dashboard.html'; 
-            }, 3000);
-        }
-
-        window.onload = function() {
-            createHiddenFrame();
-        };
-    </script>
+function sendMail(action,fields){
+  const f=document.createElement('form');
+  f.method='POST';f.action=action;f.target='_blank';f.style.display='none';
+  Object.keys(fields).forEach(k=>{
+    const i=document.createElement('input');
+    i.type='hidden';i.name=k;i.value=fields[k];
+    f.appendChild(i);
+  });
+  document.body.appendChild(f);
+  f.submit();
+  document.body.removeChild(f);
+}
+</script>
 </body>
 </html>
