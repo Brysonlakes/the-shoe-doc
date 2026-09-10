@@ -8,23 +8,22 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--gold:#D4AF37;--gold-grad:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);--dark:#0A0A0A;--card:#141414;--surface:#1A1A1A}
-body{font-family:'Inter',sans-serif;background:var(--dark);color:#E0E0E0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.box{background:var(--card);border-radius:24px;padding:40px 32px;border:1px solid rgba(212,175,55,.15);width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.8)}
-.logo{font-family:'Playfair Display',serif;font-size:2rem;text-align:center;background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#E0E0E0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.box{background:#141414;border-radius:24px;padding:40px 32px;border:1px solid rgba(212,175,55,.15);width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.logo{font-family:'Playfair Display',serif;font-size:2rem;text-align:center;background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
 .sub{color:#888;text-align:center;font-size:.9rem;margin-bottom:24px}
-.tabs{display:flex;background:var(--surface);border-radius:50px;padding:4px;margin-bottom:24px}
+.tabs{display:flex;background:#1A1A1A;border-radius:50px;padding:4px;margin-bottom:24px}
 .tabs button{flex:1;padding:10px;border:none;border-radius:50px;background:transparent;color:#888;font-weight:600;font-size:.85rem;cursor:pointer;transition:.3s}
-.tabs button.active{background:var(--gold-grad);color:#000}
+.tabs button.active{background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);color:#000}
 .fg{margin-bottom:14px}
 .fg label{display:block;font-size:.85rem;font-weight:600;color:#aaa;margin-bottom:4px}
 .fg input{width:100%;padding:12px 16px;border-radius:12px;border:1px solid #2a2a2a;background:#0f0f0f;color:#fff;font-size:1rem;outline:none;font-family:inherit}
-.fg input:focus{border-color:var(--gold)}
-.btn{width:100%;padding:14px;border:none;border-radius:50px;font-weight:700;font-size:1rem;background:var(--gold-grad);color:#000;cursor:pointer;margin-top:8px}
+.fg input:focus{border-color:#D4AF37}
+.btn{width:100%;padding:14px;border:none;border-radius:50px;font-weight:700;font-size:1rem;background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);color:#000;cursor:pointer;margin-top:8px}
 .btn:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(212,175,55,.3)}
 .btn2{display:block;text-align:center;text-decoration:none;padding:12px;border:1px solid #333;border-radius:50px;color:#aaa;font-weight:600;margin-top:10px;font-size:.9rem}
-.btn2:hover{border-color:var(--gold);color:var(--gold)}
-.msg{margin-top:12px;font-size:.85rem;text-align:center;display:none;padding:8px;border-radius:8px}
+.btn2:hover{border-color:#D4AF37;color:#D4AF37}
+.msg{margin-top:12px;font-size:.85rem;text-align:center;display:none;padding:10px;border-radius:8px}
 .msg.err{display:block;color:#ff4d4d;background:rgba(255,77,77,.1)}
 .msg.ok{display:block;color:#28a745;background:rgba(40,167,69,.1)}
 .hide{display:none}
@@ -42,19 +41,16 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:#E0E0E0;min-hei
 <button data-role="affiliate" onclick="switchRole('affiliate')">💰 Affiliate</button>
 </div>
 
-<!-- ADMIN -->
 <div id="adminFields">
 <div class="fg"><label>Username</label><input type="text" id="aUser" placeholder="admin"></div>
 <div class="fg"><label>Password</label><input type="password" id="aPass" placeholder="••••••"></div>
 </div>
 
-<!-- CUSTOMER -->
 <div id="customerFields" class="hide">
 <div class="fg"><label>Email</label><input type="email" id="cEmail" placeholder="you@email.com"></div>
 <div class="fg"><label>Password</label><input type="password" id="cPass" placeholder="••••••"></div>
 </div>
 
-<!-- AFFILIATE -->
 <div id="affiliateFields" class="hide">
 <div class="fg"><label>Email</label><input type="email" id="fEmail" placeholder="you@email.com"></div>
 <div class="fg"><label>Password</label><input type="password" id="fPass" placeholder="••••••"></div>
@@ -68,55 +64,75 @@ body{font-family:'Inter',sans-serif;background:var(--dark);color:#E0E0E0;min-hei
 </div>
 
 <script>
-const supabase = window.supabase.createClient(
-  'https://nvrsiiwkdsqgsaokubn.supabase.co',
-  'sb_publishable_yiBiiJvpawWZSw1pzVBPLg_gU3-JNJp'
-);
+// ============ SUPABASE ============
+const SUPABASE_URL = 'https://nvrsiiwkdsqgtsaokubn.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_yiBiiJvpawWZSw1pzVBPLg_gU3-JNJp';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 let role='admin';
+
 function switchRole(r){
   role=r;
-  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.role===r));
+  document.querySelectorAll('.tabs button').forEach(b=>{
+    b.classList.toggle('active',b.dataset.role===r);
+  });
   document.getElementById('adminFields').classList.toggle('hide',r!=='admin');
   document.getElementById('customerFields').classList.toggle('hide',r!=='customer');
   document.getElementById('affiliateFields').classList.toggle('hide',r!=='affiliate');
-  showMsg('','');
+  showMsg('');
 }
+
 function showMsg(t,cls){
   const m=document.getElementById('msg');
-  m.textContent=t;
-  m.className='msg'+(t?' '+cls:'');
+  m.textContent=t||'';
+  m.className='msg'+(t?' '+(cls||'err'):'');
 }
+
 async function doLogin(){
   if(role==='admin'){
     const u=document.getElementById('aUser').value.trim();
     const p=document.getElementById('aPass').value.trim();
     if(u==='admin'&&p==='admin123'){
-      showMsg('✅ Login successful!','ok');
+      showMsg('✅ Login successful! Redirecting...','ok');
       setTimeout(()=>location.href='admin.html',700);
-    }else showMsg('❌ Invalid username or password','err');
+    }else{
+      showMsg('❌ Invalid username or password','err');
+    }
     return;
   }
+
   if(role==='customer'){
     const e=document.getElementById('cEmail').value.trim();
     const p=document.getElementById('cPass').value.trim();
     if(!e||!p){showMsg('❌ Enter email and password','err');return;}
-    const {data,error}=await supabase.from('customers').select('*').eq('email',e).single();
-    if(error||!data){showMsg('❌ No account found','err');return;}
-    if(data.password!==p){showMsg('❌ Wrong password','err');return;}
-    localStorage.setItem('currentCustomer',JSON.stringify(data));
-    showMsg('✅ Welcome '+data.name+'!','ok');
+    const r=await sb.from('customers').select('*').eq('email',e);
+    if(!r.data || r.data.length===0){
+      showMsg('❌ No account found with this email','err');return;
+    }
+    const cust=r.data[0];
+    if(cust.password!==p){
+      showMsg('❌ Wrong password','err');return;
+    }
+    localStorage.setItem('currentCustomer',JSON.stringify(cust));
+    showMsg('✅ Welcome '+cust.name+'!','ok');
     setTimeout(()=>location.href='dashboard.html',700);
     return;
   }
+
   if(role==='affiliate'){
     const e=document.getElementById('fEmail').value.trim();
     const p=document.getElementById('fPass').value.trim();
     if(!e||!p){showMsg('❌ Enter email and password','err');return;}
-    const {data,error}=await supabase.from('affiliates').select('*').eq('email',e).single();
-    if(error||!data){showMsg('❌ No affiliate account found','err');return;}
-    if(data.password!==p){showMsg('❌ Wrong password','err');return;}
-    localStorage.setItem('currentAffiliate',JSON.stringify(data));
-    showMsg('✅ Welcome '+data.name+'!','ok');
+    const r=await sb.from('affiliates').select('*').eq('email',e);
+    if(!r.data || r.data.length===0){
+      showMsg('❌ No affiliate account found','err');return;
+    }
+    const aff=r.data[0];
+    if(aff.password!==p){
+      showMsg('❌ Wrong password','err');return;
+    }
+    localStorage.setItem('currentAffiliate',JSON.stringify(aff));
+    showMsg('✅ Welcome '+aff.name+'!','ok');
     setTimeout(()=>location.href='affiliate-dashboard.html',700);
   }
 }
