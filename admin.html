@@ -411,8 +411,7 @@ function setStatus(id,status){
               emailRow('Date', b.date)+
               emailRow('Time', b.time)+
               emailRow('Total Due', 'R'+b.total_due)+
-            '</div>'+
-            '<p style="color:#aaa">Please drop off your shoes at <strong>123 Oxford Street, East London</strong>.</p>'+
+                      '<p style="color:#aaa">Please drop off your shoes at <strong>123 Oxford Street, East London</strong>.</p>'
           ));
       } else if(status==='completed'){
         sendMail(b.email,'✔️ Service Completed - THE SHOE DOC',
