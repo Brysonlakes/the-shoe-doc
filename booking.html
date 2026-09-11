@@ -314,10 +314,29 @@ function submitBooking(){
         if(a.data && a.data.length>0){
           var aff=a.data[0];
           var commission=pairs*20;
+          var newBalance=(aff.balance||0)+commission;
           sb.from('affiliates').update({
-            balance:(aff.balance||0)+commission,
+            balance:newBalance,
             total_earned:(aff.total_earned||0)+commission
           }).eq('id',aff.id);
+
+          // Notify affiliate they earned a commission
+          sendMail(aff.email,'💰 You earned R'+commission+'! - THE SHOE DOC',
+            emailLayout('💰 You Just Earned a Commission!',
+              '<p style="margin-top:0">Hello <strong style="color:#D4AF37">'+aff.name+'</strong>,</p>'+
+              '<p>Great news — a customer just used your affiliate code!</p>'+
+              '<div style="background:#0f0f0f;border-radius:10px;padding:14px 18px;margin:14px 0;border-left:3px solid #D4AF37">'+
+                emailRow('Customer', name)+
+                emailRow('Services', servicesList)+
+                emailRow('Total Pairs', pairs)+
+                emailRow('You Earned', 'R'+commission)+
+                emailRow('New Balance', 'R'+newBalance)+
+              '</div>'+
+              '<p style="color:#aaa">Keep sharing your code <strong style="color:#D4AF37">'+aff.affiliate_code+'</strong> to earn more!</p>'+
+              '<div style="text-align:center;margin:24px 0">'+
+                '<a href="https://brysonlakes.github.io/the-shoe-doc/affiliate-dashboard.html" style="display:inline-block;background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);color:#000;text-decoration:none;padding:14px 32px;border-radius:50px;font-weight:bold">View My Dashboard →</a>'+
+              '</div>'
+            ));
         }
       });
     }
