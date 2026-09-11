@@ -1,1 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>THE SHOE DOC · Become an Affiliate</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0A0A0A;color:#E0E0E0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.box{background:#141414;border-radius:24px;padding:40px 32px;border:1px solid rgba(212,175,55,.15);width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.logo{font-family:'Playfair Display',serif;font-size:2rem;text-align:center;background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.sub{color:#888;text-align:center;font-size:.9rem;margin-bottom:24px}
+.info{background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.15);border-radius:12px;padding:16px;margin-bottom:20px}
+.info h4{color:#D4AF37;margin-bottom:8px;font-size:.95rem}
+.info ul{list-style:none;color:#aaa;font-size:.85rem}
+.info li{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.info li:last-child{border-bottom:none}
+.info li strong{color:#D4AF37}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:.85rem;font-weight:600;color:#aaa;margin-bottom:4px}
+.fg input{width:100%;padding:12px 16px;border-radius:12px;border:1px solid #2a2a2a;background:#0f0f0f;color:#fff;font-size:1rem;outline:none;font-family:inherit}
+.fg input:focus{border-color:#D4AF37}
+.btn{width:100%;padding:14px;border:none;border-radius:50px;font-weight:700;font-size:1rem;background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);color:#000;cursor:pointer;margin-top:8px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 0 30px rgba(212,175,55,.3)}
+.msg{margin-top:12px;font-size:.85rem;text-align:center;display:none;padding:10px;border-radius:8px}
+.msg.err{display:block;color:#ff4d4d;background:rgba(255,77,77,.1)}
+.msg.ok{display:block;color:#28a745;background:rgba(40,167,69,.1);word-break:break-all}
+.foot{text-align:center;margin-top:20px;color:#666;font-size:.8rem}
+.foot a{color:#D4AF37;text-decoration:none}
+@media(max-width:480px){.box{padding:28px 20px}}
+</style>
+</head>
+<body>
+<div class="box">
+<div class="logo">THE SHOE DOC</div>
+<p class="sub">💰 Become an Affiliate Marketer</p>
 
+<div class="info">
+<h4>💰 How You Earn</h4>
+<ul>
+<li><span>Basic Wash</span><strong>R15/pair</strong></li>
+<li><span>Deep Clean</span><strong>R20/pair</strong></li>
+<li><span>Premium Care</span><strong>R30/pair</strong></li>
+<li><span>Min Payout</span><strong>R200</strong></li>
+</ul>
+</div>
+
+<div class="fg"><label>Full Name *</label><input type="text" id="iName" placeholder="Thabo M."></div>
+<div class="fg"><label>Email *</label><input type="email" id="iEmail" placeholder="you@email.com"></div>
+<div class="fg"><label>Phone *</label><input type="tel" id="iPhone" placeholder="082 123 4567"></div>
+<div class="fg"><label>Password *</label><input type="password" id="iPass" placeholder="Min 6 characters"></div>
+<div class="fg"><label>Confirm Password *</label><input type="password" id="iPass2" placeholder="Repeat password"></div>
+<div class="fg"><label>Referred By (Optional)</label><input type="text" id="iRef" placeholder="Enter affiliate code if referred"></div>
+<div class="fg"><label>Bank Name *</label><input type="text" id="iBank" placeholder="e.g. Standard Bank"></div>
+<div class="fg"><label>Account Number *</label><input type="text" id="iAcc" placeholder="1234567890"></div>
+
+<button class="btn" onclick="doRegister()">Become an Affiliate</button>
+<div id="msg" class="msg"></div>
+
+<div class="foot">
+<p>Already an affiliate? <a href="index.html">Login here</a></p>
+<p style="margin-top:6px"><a href="index.html">← Back to Main Site</a></p>
+</div>
+</div>
+
+<script>
+var SB_URL='https://nvrsiiwkdsqgtsaokubn.supabase.co';
+var SB_KEY='sb_publishable_yiBiiJvpawWZSw1pzVBPLg_gU3-JNJp';
+var sb=window.supabase.createClient(SB_URL,SB_KEY);
+
+var BREVO_KEY='';
+var SENDER_EMAIL='theshoedoc3@gmail.com';
+var SENDER_NAME='THE SHOE DOC';
+
+sb.from('settings').select('*').eq('key','brevo_api_key').then(function(r){
+  if(r.data && r.data.length>0) BREVO_KEY=r.data[0].value;
+});
+
+function showMsg(text,type){
+  var m=document.getElementById('msg');
+  m.textContent=text;
+  m.className='msg '+type;
+}
+
+function genCode(name){
+  var prefix=(name.substring(0,3)||'AFF').toUpperCase();
+  var rand=Math.random().toString(36).substring(2,6).toUpperCase();
+  return prefix+rand;
+}
+
+// ============ EMAIL TEMPLATE ============
+function emailLayout(title, bodyHtml){
+  return ''+
+  '<div style="font-family:Arial,Helvetica,sans-serif;background:#0A0A0A;padding:30px 15px;color:#E0E0E0">'+
+    '<div style="max-width:560px;margin:0 auto;background:#141414;border:1px solid #D4AF37;border-radius:16px;overflow:hidden">'+
+      '<div style="background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);padding:24px;text-align:center">'+
+        '<h1 style="margin:0;font-family:Georgia,serif;font-size:26px;color:#000;letter-spacing:2px">THE SHOE DOC</h1>'+
+        '<p style="margin:4px 0 0;font-size:12px;color:#3a2a00">Premium Shoe Cleaning · East London</p>'+
+      '</div>'+
+      '<div style="padding:24px 28px 0">'+
+        '<h2 style="margin:0;color:#D4AF37;font-family:Georgia,serif;font-size:22px">'+title+'</h2>'+
+      '</div>'+
+      '<div style="padding:16px 28px 28px;font-size:15px;line-height:1.6;color:#E0E0E0">'+bodyHtml+'</div>'+
+      '<div style="background:#0f0f0f;padding:20px 28px;text-align:center;border-top:1px solid #222">'+
+        '<p style="margin:0 0 6px;color:#D4AF37;font-weight:bold">THE SHOE DOC</p>'+
+        '<p style="margin:0;font-size:12px;color:#888">📍 123 Oxford Street, East London</p>'+
+        '<p style="margin:4px 0 0;font-size:12px;color:#888">📞 082-590-2968 · WhatsApp available</p>'+
+        '<p style="margin:12px 0 0;font-size:11px;color:#555">© 2026 THE SHOE DOC · All rights reserved</p>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function emailRow(label, value){
+  return '<table style="width:100%;border-collapse:collapse;margin:6px 0"><tr>'+
+    '<td style="padding:8px 0;color:#888;font-size:13px;width:40%">'+label+'</td>'+
+    '<td style="padding:8px 0;color:#fff;font-weight:bold;text-align:right">'+value+'</td>'+
+    '</tr></table>';
+}
+
+function sendMail(toEmail, subject, htmlContent){
+  if(!BREVO_KEY){console.warn('⚠️ Email skipped');return;}
+  fetch('https://api.brevo.com/v3/smtp/email',{
+    method:'POST',
+    headers:{'accept':'application/json','content-type':'application/json','api-key':BREVO_KEY},
+    body:JSON.stringify({
+      sender:{name:SENDER_NAME,email:SENDER_EMAIL},
+      to:[{email:toEmail}],
+      subject:subject,
+      htmlContent:htmlContent
+    })
+  }).then(function(r){
+    if(r.ok)console.log('✅ Email sent to '+toEmail);
+    else r.json().then(function(e){console.error('❌',e);});
+  });
+}
+
+async function doRegister(){
+  var name=document.getElementById('iName').value.trim();
+  var email=document.getElementById('iEmail').value.trim();
+  var phone=document.getElementById('iPhone').value.trim();
+  var pass=document.getElementById('iPass').value;
+  var pass2=document.getElementById('iPass2').value;
+  var ref=document.getElementById('iRef').value.trim().toUpperCase();
+  var bank=document.getElementById('iBank').value.trim();
+  var acc=document.getElementById('iAcc').value.trim();
+
+  if(!name||!email||!phone||!pass||!pass2||!bank||!acc){
+    showMsg('❌ Please fill in all required fields','err');return;
+  }
+  if(pass.length<6){showMsg('❌ Password must be at least 6 characters','err');return;}
+  if(pass!==pass2){showMsg('❌ Passwords do not match','err');return;}
+
+  var existing=await sb.from('affiliates').select('email').eq('email',email);
+  if(existing.data && existing.data.length>0){
+    showMsg('❌ This email is already registered','err');return;
+  }
+
+  var referredBy=null;
+  if(ref){
+    var r=await sb.from('affiliates').select('id').eq('affiliate_code',ref);
+    if(!r.data || r.data.length===0){
+      showMsg('❌ Invalid referral code','err');return;
+    }
+    referredBy=r.data[0].id;
+  }
+
+  var code=genCode(name);
+  var newAff={
+    id:Date.now(),
+    name:name, email:email, phone:phone, password:pass,
+    affiliate_code:code,
+    referred_by:referredBy,
+    bank_name:bank,
+    account_number:acc,
+    balance:0, total_earned:0,
+    referrals:[], downline:[],
+    status:'active'
+  };
+
+  var result=await sb.from('affiliates').insert([newAff]).select();
+  if(result.error){showMsg('❌ '+result.error.message,'err');return;}
+
+  if(referredBy){
+    var r2=await sb.from('affiliates').select('downline').eq('id',referredBy);
+    if(r2.data && r2.data.length>0){
+      var down=r2.data[0].downline||[];
+      down.push(newAff.id);
+      await sb.from('affiliates').update({downline:down}).eq('id',referredBy);
+    }
+  }
+
+  // Graphical welcome email
+  sendMail(email,'💰 Welcome to THE SHOE DOC Affiliates!',
+    emailLayout('💰 Welcome to the Program!',
+      '<p style="margin-top:0">Hello <strong style="color:#D4AF37">'+name+'</strong>,</p>'+
+      '<p>Welcome to the <strong>THE SHOE DOC affiliate program</strong>!</p>'+
+      '<div style="background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);border-radius:10px;padding:20px;margin:18px 0;text-align:center">'+
+        '<p style="margin:0;color:#000;font-size:12px;font-weight:bold;letter-spacing:2px">YOUR AFFILIATE CODE</p>'+
+        '<p style="margin:8px 0 0;color:#000;font-size:26px;font-weight:bold;letter-spacing:4px;font-family:monospace">'+code+'</p>'+
+      '</div>'+
+      '<p>Share this code with your friends. You earn <strong style="color:#D4AF37">R15–R30 per pair</strong> they book!</p>'+
+      '<div style="background:#0f0f0f;border-radius:10px;padding:14px 18px;margin:14px 0;border-left:3px solid #D4AF37">'+
+        emailRow('Basic Wash', 'R15 per pair')+
+        emailRow('Deep Clean', 'R20 per pair')+
+        emailRow('Premium Care', 'R30 per pair')+
+        emailRow('Min Payout', 'R200')+
+      '</div>'+
+      '<div style="text-align:center;margin:24px 0">'+
+        '<a href="https://brysonlakes.github.io/the-shoe-doc/affiliate-dashboard.html" style="display:inline-block;background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);color:#000;text-decoration:none;padding:14px 32px;border-radius:50px;font-weight:bold">Open My Dashboard →</a>'+
+      '</div>'+
+      '<p style="color:#aaa">Welcome aboard,<br>THE SHOE DOC Team</p>'
+    ));
+
+  showMsg('✅ Welcome '+name+'! Your code: '+code+' — Redirecting...','ok');
+  localStorage.setItem('currentAffiliate',JSON.stringify(newAff));
+  setTimeout(function(){location.href='affiliate-dashboard.html';},2500);
+}
+</script>
+</body>
+</html>
