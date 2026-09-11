@@ -287,6 +287,7 @@ function submitBooking(){
     delivery_fee:deliveryFee,
     total_due:deposit+deliveryFee,
     payment_method:payment,
+     payment_confirmed:false,
     affiliate_code:affiliate||null,
     status:payment==='cash'?'confirmed':'pending_payment',
     paid:false
