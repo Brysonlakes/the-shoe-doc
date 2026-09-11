@@ -76,7 +76,8 @@ p{color:#888;margin-bottom:32px}
 <div><span>Total Pairs:</span><span id="tPairs">1</span></div>
 <div><span>Subtotal:</span><span id="tSub">R60</span></div>
 <div class="big"><span>Total:</span><span id="tTotal">R60</span></div>
-<div style="font-size:.8rem;color:#888"><span>Deposit:</span><span id="tDep">R30</span></div>
+<div id="depositRow" style="font-size:.8rem;color:#888"><span>Deposit (50%):</span><span id="tDep">R30</span></div>
+<div id="cashRow" style="font-size:.8rem;color:#D4AF37;display:none;font-weight:600"><span>Cash Due at Shop:</span><span id="tCash">R60</span></div>
 </div>
 
 <div class="fg"><label>Delivery *</label>
@@ -84,7 +85,7 @@ p{color:#888;margin-bottom:32px}
 </div>
 
 <div class="fg"><label>Payment *</label>
-<select id="iPay"><option value="payfast">Payfast (Online)</option><option value="cash">Cash at Shop</option></select>
+<select id="iPay" onchange="calc()"><option value="payfast">Payfast (Online)</option><option value="cash">Cash at Shop</option></select>
 </div>
 
 <div class="fg"><label>Affiliate Code (optional)</label><input type="text" id="iAff" placeholder="e.g. THO123"></div>
@@ -243,6 +244,12 @@ function calc(){
   document.getElementById('tSub').textContent='R'+sub;
   document.getElementById('tTotal').textContent='R'+total;
   document.getElementById('tDep').textContent='R'+dep;
+  document.getElementById('tCash').textContent='R'+total;
+
+  // Show deposit or cash row based on payment method
+  var pay=document.getElementById('iPay').value;
+  document.getElementById('depositRow').style.display=(pay==='cash')?'none':'block';
+  document.getElementById('cashRow').style.display=(pay==='cash')?'block':'none';
 }
 document.getElementById('modal').addEventListener('click',function(e){if(e.target===e.currentTarget)closeModal();});
 
@@ -264,8 +271,15 @@ function submitBooking(){
   var pairs=0,sub=0;
   rows.forEach(function(r){pairs+=r.quantity;sub+=r.price;});
   var servicesList=rows.map(function(r){return r.service+' ('+r.quantity+' pair'+(r.quantity>1?'s':'')+')';}).join(', ');
-  var deliveryFee=delivery==='fetch'?DELIVERY_FEE:0;
-  var deposit=Math.max(30,Math.round((sub+deliveryFee)*0.5));
+    var deliveryFee=delivery==='fetch'?DELIVERY_FEE:0;
+  var fullTotal=sub+deliveryFee;
+  var deposit=Math.max(30,Math.round(fullTotal*0.5));
+
+  // For cash, the full amount is due at the shop
+  if(payment==='cash'){
+    deposit=fullTotal;      // full amount due
+  }
+
   var invoice='INV-'+Date.now().toString().slice(-8);
   var pointsEarned=Math.floor(sub/10);
 
@@ -285,7 +299,7 @@ function submitBooking(){
     delivery_address:'N/A',
     deposit:deposit,
     delivery_fee:deliveryFee,
-    total_due:deposit+deliveryFee,
+    total_due:(payment==='cash')?fullTotal:(deposit+deliveryFee),
     payment_method:payment,
      payment_confirmed:false,
     affiliate_code:affiliate||null,
@@ -355,8 +369,11 @@ function submitBooking(){
           emailRow('Total Pairs', pairs)+
           emailRow('Date', date)+
           emailRow('Time', time)+
-          emailRow('Deposit', 'R'+deposit)+
-          emailRow('Total Due', 'R'+(deposit+deliveryFee))+
+            (payment==='cash'
+          ? emailRow('Amount Due at Shop', 'R'+fullTotal)
+          : emailRow('Deposit Due Now', 'R'+deposit)+emailRow('Balance at Shop', 'R'+((fullTotal-deposit)))
+          )+
+          emailRow('Total', 'R'+fullTotal)+
         '</div>'+
         '<p style="color:#aaa">We will contact you shortly to confirm your booking.</p>'+
         '<p style="color:#aaa">Need to change anything? Reply to this email or WhatsApp us on <strong style="color:#D4AF37">082-590-2968</strong>.</p>'
@@ -377,8 +394,12 @@ function submitBooking(){
           emailRow('Total Pairs', pairs)+
           emailRow('Date', date)+
           emailRow('Time', time)+
-          emailRow('Total Due', 'R'+(deposit+deliveryFee))+
+          emailRow('Total', 'R'+fullTotal)+
           emailRow('Payment', payment)+
+          (payment==='cash'
+            ? emailRow('Cash Due at Shop', 'R'+fullTotal)
+            : emailRow('Deposit Due Now', 'R'+deposit)+emailRow('Balance at Shop', 'R'+((fullTotal-deposit)))
+          )+
         '</div>'+
         '<p style="color:#aaa">Open the admin panel to manage this booking.</p>'
       )
