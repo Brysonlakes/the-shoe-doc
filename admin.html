@@ -381,10 +381,28 @@ function viewBooking(id){
 }
 
 function setStatus(id,status){
+  var b=allBookings.find(function(x){return x.id===id;});
+  if(!b){banner('❌ Booking not found','err');return;}
+
+  // Block marking paid if online payment isn't confirmed
+  if(status==='paid'){
+    var method=b.payment_method||'payfast';
+    var confirmed=b.payment_confirmed===true;
+
+    if(method!=='cash' && !confirmed){
+      var ok=confirm(
+        '⚠️ This booking was made with an ONLINE payment method.\n\n'+
+        'The customer has NOT been verified as paid yet.\n\n'+
+        'Are you SURE you want to mark this booking as PAID?\n'+
+        'This means you have manually received the money.'
+      );
+      if(!ok){banner('❌ Cancelled — payment not confirmed','err');return;}
+    }
+  }
+
   sb.from('bookings').update({status:status,paid:(status!=='pending_payment')}).eq('id',id).then(function(r){
     if(r.error){banner('❌ '+r.error.message,'err');return;}
 
-    var b=allBookings.find(function(x){return x.id===id;});
     if(b){
       if(status==='paid'){
         sendMail(b.email,'💰 Payment Confirmed - THE SHOE DOC',
@@ -432,7 +450,6 @@ function setStatus(id,status){
     loadAll();
   });
 }
-
 function emailReady(id){
   var b=allBookings.find(function(x){return x.id===id;});
   if(!b)return;
