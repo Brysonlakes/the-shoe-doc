@@ -381,7 +381,58 @@ function viewBooking(id){
 function setStatus(id,status){
   sb.from('bookings').update({status:status,paid:(status!=='pending_payment')}).eq('id',id).then(function(r){
     if(r.error){banner('❌ '+r.error.message,'err');return;}
-    banner('✅ Status → '+status,'ok');
+
+    var b=allBookings.find(function(x){return x.id===id;});
+    if(b){
+      if(status==='paid'){
+        sendMail(b.email,'💰 Payment Confirmed - THE SHOE DOC',
+          emailLayout('💰 Payment Confirmed',
+            '<p style="margin-top:0">Hello <strong style="color:#D4AF37">'+b.customer+'</strong>,</p>'+
+            '<p>We have received your payment. Your booking is now <strong style="color:#28a745">confirmed</strong>.</p>'+
+            '<div style="background:#0f0f0f;border-radius:10px;padding:14px 18px;margin:14px 0;border-left:3px solid #D4AF37">'+
+              emailRow('Invoice', b.invoice)+
+              emailRow('Services', b.services_list||'N/A')+
+              emailRow('Date', b.date+' at '+b.time)+
+              emailRow('Amount Paid', 'R'+b.deposit)+
+              emailRow('Balance', 'R'+((b.total_due||0)-(b.deposit||0)))+
+            '</div>'+
+            '<p style="color:#aaa">Thanks for your payment! We will see you soon.</p>'
+          ));
+      }
+      else if(status==='confirmed'){
+        sendMail(b.email,'✅ Booking Confirmed - THE SHOE DOC',
+          emailLayout('✅ Booking Confirmed',
+            '<p style="margin-top:0">Hello <strong style="color:#D4AF37">'+b.customer+'</strong>,</p>'+
+            '<p>Your booking is now <strong style="color:#28a745">confirmed</strong> and reserved.</p>'+
+            '<div style="background:#0f0f0f;border-radius:10px;padding:14px 18px;margin:14px 0;border-left:3px solid #D4AF37">'+
+              emailRow('Invoice', b.invoice)+
+              emailRow('Services', b.services_list||'N/A')+
+              emailRow('Total Pairs', b.total_pairs||1)+
+              emailRow('Date', b.date)+
+              emailRow('Time', b.time)+
+              emailRow('Total Due', 'R'+b.total_due)+
+            '</div>'+
+            '<p style="color:#aaa">Please drop off your shoes at <strong>123 Oxford Street, East London</strong>.</p>'+
+            '<p style="color:#aaa">Questions? WhatsApp 082-590-2968.</p>'
+          ));
+      }
+      else if(status==='completed'){
+        sendMail(b.email,'✔️ Service Completed - THE SHOE DOC',
+          emailLayout('✔️ Service Completed',
+            '<p style="margin-top:0">Hello <strong style="color:#D4AF37">'+b.customer+'</strong>,</p>'+
+            '<p>Your <strong>'+b.services_list+'</strong> service has been <strong style="color:#28a745">completed</strong>!</p>'+
+            '<div style="background:#0f0f0f;border-radius:10px;padding:14px 18px;margin:14px 0;border-left:3px solid #D4AF37">'+
+              emailRow('Invoice', b.invoice)+
+              emailRow('Services', b.services_list||'N/A')+
+              emailRow('Total Pairs', b.total_pairs||1)+
+            '</div>'+
+            '<p style="color:#aaa">We hope you love the results! Reply with any feedback.</p>'+
+            '<p style="color:#aaa">See you next time! 👟</p>'
+          ));
+      }
+    }
+
+    banner('✅ Status → '+status+' (email sent)','ok');
     loadAll();
   });
 }
