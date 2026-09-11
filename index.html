@@ -104,6 +104,61 @@ var db=window.supabase.createClient(SB_URL,SB_KEY);
 
 var role='admin';
 
+// ============ BREVO EMAIL ============
+var BREVO_KEY='';
+var SENDER_EMAIL='theshoedoc3@gmail.com';
+var SENDER_NAME='THE SHOE DOC';
+
+db.from('settings').select('*').eq('key','brevo_api_key').then(function(r){
+  if(r.data && r.data.length>0) BREVO_KEY=r.data[0].value;
+});
+
+function sendMail(toEmail, subject, htmlContent){
+  if(!BREVO_KEY){console.warn('⚠️ Email skipped — key not loaded');return;}
+  fetch('https://api.brevo.com/v3/smtp/email',{
+    method:'POST',
+    headers:{'accept':'application/json','content-type':'application/json','api-key':BREVO_KEY},
+    body:JSON.stringify({
+      sender:{name:SENDER_NAME,email:SENDER_EMAIL},
+      to:[{email:toEmail}],
+      subject:subject,
+      htmlContent:htmlContent
+    })
+  }).then(function(r){
+    if(r.ok)console.log('✅ Email sent to '+toEmail);
+    else r.json().then(function(e){console.error('❌ Brevo error:',e);});
+  }).catch(function(err){console.error('❌ Network:',err);});
+}
+
+function emailLayout(title, bodyHtml){
+  return ''+
+  '<div style="font-family:Arial,Helvetica,sans-serif;background:#0A0A0A;padding:30px 15px;color:#E0E0E0">'+
+    '<div style="max-width:560px;margin:0 auto;background:#141414;border:1px solid #D4AF37;border-radius:16px;overflow:hidden">'+
+      '<div style="background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);padding:24px;text-align:center">'+
+        '<h1 style="margin:0;font-family:Georgia,serif;font-size:26px;color:#000;letter-spacing:2px">THE SHOE DOC</h1>'+
+        '<p style="margin:4px 0 0;font-size:12px;color:#3a2a00">Premium Shoe Cleaning · East London</p>'+
+      '</div>'+
+      '<div style="padding:24px 28px 0">'+
+        '<h2 style="margin:0;color:#D4AF37;font-family:Georgia,serif;font-size:22px">'+title+'</h2>'+
+      '</div>'+
+      '<div style="padding:16px 28px 28px;font-size:15px;line-height:1.6;color:#E0E0E0">'+bodyHtml+'</div>'+
+      '<div style="background:#0f0f0f;padding:20px 28px;text-align:center;border-top:1px solid #222">'+
+        '<p style="margin:0 0 6px;color:#D4AF37;font-weight:bold">THE SHOE DOC</p>'+
+        '<p style="margin:0;font-size:12px;color:#888">📍 123 Oxford Street, East London</p>'+
+        '<p style="margin:4px 0 0;font-size:12px;color:#888">📞 082-590-2968 · WhatsApp available</p>'+
+        '<p style="margin:12px 0 0;font-size:11px;color:#555">© 2026 THE SHOE DOC · All rights reserved</p>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function emailRow(label, value){
+  return '<table style="width:100%;border-collapse:collapse;margin:6px 0"><tr>'+
+    '<td style="padding:8px 0;color:#888;font-size:13px;width:40%">'+label+'</td>'+
+    '<td style="padding:8px 0;color:#fff;font-weight:bold;text-align:right">'+value+'</td>'+
+    '</tr></table>';
+}
+
 function switchRole(r){
   role=r;
   var tabs=document.querySelectorAll('.tabs button');
@@ -221,6 +276,41 @@ function doRegister(){
         showRMsg('❌ '+res.error.message,'err');
         return;
       }
+           // Email to customer
+      sendMail(email,'👋 Welcome to THE SHOE DOC!',
+        emailLayout('👋 Welcome!',
+          '<p style="margin-top:0">Hello <strong style="color:#D4AF37">'+name+'</strong>,</p>'+
+          '<p>Your THE SHOE DOC account has been created successfully!</p>'+
+          '<div style="background:#0f0f0f;border-radius:10px;padding:14px 18px;margin:14px 0;border-left:3px solid #D4AF37">'+
+            emailRow('Name', name)+
+            emailRow('Email', email)+
+            emailRow('Phone', phone)+
+          '</div>'+
+          '<p>You can now:</p>'+
+          '<ul style="color:#aaa;padding-left:20px">'+
+            '<li>Track all your bookings</li>'+
+            '<li>Earn reward points on every booking</li>'+
+            '<li>Get R5 off for every 10 points earned</li>'+
+          '</ul>'+
+          '<div style="text-align:center;margin:24px 0">'+
+            '<a href="https://brysonlakes.github.io/the-shoe-doc/booking.html" style="display:inline-block;background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);color:#000;text-decoration:none;padding:14px 32px;border-radius:50px;font-weight:bold">Book Your First Cleaning →</a>'+
+          '</div>'+
+          '<p style="color:#aaa">Thanks for joining!<br>THE SHOE DOC Team</p>'
+        ));
+
+      // Email to admin
+      sendMail('theshoedoc3@gmail.com','👤 New Customer Registered - '+name,
+        emailLayout('👤 New Customer Registered',
+          '<p style="margin-top:0">A new customer just registered:</p>'+
+          '<div style="background:#0f0f0f;border-radius:10px;padding:14px 18px;margin:14px 0;border-left:3px solid #D4AF37">'+
+            emailRow('Name', name)+
+            emailRow('Email', email)+
+            emailRow('Phone', phone)+
+            emailRow('Registered', new Date().toLocaleString())+
+          '</div>'+
+          '<p style="color:#aaa">Open the admin panel to view all customers.</p>'
+        ));
+
       showRMsg('✅ Account created! Logging you in...','ok');
       localStorage.setItem('currentCustomer',JSON.stringify(res.data[0]));
       setTimeout(function(){location.href='dashboard.html';},1200);
