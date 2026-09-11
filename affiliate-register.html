@@ -193,6 +193,7 @@ async function doRegister(){
   }
 
   // Graphical welcome email
+   // Graphical welcome email to affiliate
   sendMail(email,'💰 Welcome to THE SHOE DOC Affiliates!',
     emailLayout('💰 Welcome to the Program!',
       '<p style="margin-top:0">Hello <strong style="color:#D4AF37">'+name+'</strong>,</p>'+
@@ -212,6 +213,22 @@ async function doRegister(){
         '<a href="https://brysonlakes.github.io/the-shoe-doc/affiliate-dashboard.html" style="display:inline-block;background:linear-gradient(135deg,#F9D976,#D4AF37,#B8860B);color:#000;text-decoration:none;padding:14px 32px;border-radius:50px;font-weight:bold">Open My Dashboard →</a>'+
       '</div>'+
       '<p style="color:#aaa">Welcome aboard,<br>THE SHOE DOC Team</p>'
+    ));
+
+  // ADMIN notification — new affiliate registered
+  sendMail('theshoedoc3@gmail.com','🤝 New Affiliate Registered - '+name,
+    emailLayout('🤝 New Affiliate Registered',
+      '<p style="margin-top:0">A new affiliate just signed up:</p>'+
+      '<div style="background:#0f0f0f;border-radius:10px;padding:14px 18px;margin:14px 0;border-left:3px solid #D4AF37">'+
+        emailRow('Name', name)+
+        emailRow('Email', email)+
+        emailRow('Phone', phone)+
+        emailRow('Affiliate Code', code)+
+        emailRow('Bank', bank)+
+        emailRow('Account No.', acc)+
+        emailRow('Referred By', ref||'None')+
+      '</div>'+
+      '<p style="color:#aaa">Open the admin panel to view their profile.</p>'
     ));
 
   showMsg('✅ Welcome '+name+'! Your code: '+code+' — Redirecting...','ok');
