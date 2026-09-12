@@ -338,7 +338,7 @@ function renderBookings(){
   });
   var box=document.getElementById('bookBox');
   if(rows.length===0){box.innerHTML='<div class="empty"><div class="ic">📭</div><p>No bookings found.</p></div>';return;}
-  var h='<table><thead><tr><th>Invoice</th><th>Customer</th><th>Services</th><th>Pairs</th><th>Date</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+  var h='<table><thead><tr><th>Invoice</th><th>Customer</th><th>Services</th><th>Pairs</th><th>Date</th><th>Amount</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
   rows.forEach(function(b){
     var st=b.status||'pending_payment';
     var stLabel=st.charAt(0).toUpperCase()+st.slice(1).replace('_',' ');
@@ -348,7 +348,10 @@ function renderBookings(){
       '<td>'+(b.services_list||'N/A')+'</td>'+
       '<td>'+(b.total_pairs||1)+'</td>'+
       '<td>'+(b.date||'')+'<br><span style="font-size:.68rem;color:#666">'+(b.time||'')+'</span></td>'+
-      '<td>R'+(b.total_due||0)+'</td>'+
+            '<td>R'+(b.total_due||0)+'</td>'+
+      '<td>'+(b.payment_method==='cash'
+        ? '<span style="color:#D4AF37;font-weight:600">💵 Cash</span>'
+        : '<span style="color:#17a2b8;font-weight:600">💳 Payfast</span>')+'</td>'+
       '<td><span class="badge b-'+st+'">'+stLabel+'</span></td>'+
       '<td>'+
         '<button class="act" onclick="viewBooking('+b.id+')">View</button>'+
