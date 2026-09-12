@@ -120,21 +120,45 @@ sb.from('settings').select('*').eq('key','brevo_api_key').then(function(r){
   }
 });
 
+var emailQueue=[];
+var isSending=false;
+
 function sendMail(toEmail, subject, htmlContent){
-  if(!BREVO_KEY){console.warn('Email skipped');return;}
+  // Add to queue
+  emailQueue.push({to:toEmail,subject:subject,html:htmlContent});
+  processQueue();
+}
+
+function processQueue(){
+  if(isSending || emailQueue.length===0)return;
+  isSending=true;
+  var mail=emailQueue.shift();
+  
+  if(!BREVO_KEY){
+    console.warn('Email skipped — no key');
+    isSending=false;
+    setTimeout(processQueue,1500);
+    return;
+  }
+  
   fetch('https://api.brevo.com/v3/smtp/email',{
     method:'POST',
     headers:{'accept':'application/json','content-type':'application/json','api-key':BREVO_KEY},
     body:JSON.stringify({
       sender:{name:SENDER_NAME,email:SENDER_EMAIL},
-      to:[{email:toEmail}],
-      subject:subject,
-      htmlContent:htmlContent
+      to:[{email:mail.to}],
+      subject:mail.subject,
+      htmlContent:mail.html
     })
   }).then(function(r){
-    if(r.ok)console.log('Email sent to '+toEmail);
+    if(r.ok)console.log('Email sent to '+mail.to);
     else r.json().then(function(e){console.error('Brevo error:',e);});
-  }).catch(function(err){console.error('Network:',err);});
+  }).catch(function(err){console.error('Network:',err);})
+  .finally(function(){
+    isSending=false;
+    // Wait 1.5s before next send
+    setTimeout(processQueue,1500);
+  });
 }
 
 function emailLayout(title, bodyHtml){
