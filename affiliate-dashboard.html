@@ -150,15 +150,16 @@ function load(){
       if(bookings.length===0){
         document.getElementById('refList').innerHTML='<div class="empty"><div class="ic">📭</div><p>No referrals yet. Share your code!</p></div>';
       }else{
-        var html='<table><thead><tr><th>Customer</th><th>Service</th><th>Pairs</th><th>Date</th><th>Commission</th></tr></thead><tbody>';
+                var html='<table><thead><tr><th>Customer</th><th>Service</th><th>Pairs</th><th>Date</th><th>Commission</th></tr></thead><tbody>';
         for(var i=0;i<bookings.length;i++){
           var bk=bookings[i];
           var pairs=bk.total_pairs||1;
+          var comm=20*pairs;
           html+='<tr><td><strong>'+(bk.customer||'')+'</strong></td>'+
                 '<td>'+(bk.services_list||'N/A')+'</td>'+
                 '<td>'+pairs+'</td>'+
                 '<td>'+(bk.date||'')+'</td>'+
-                '<td style="color:#D4AF37;font-weight:700">R'+(pairs*20)+'</td></tr>';
+                '<td style="color:#D4AF37;font-weight:700">R'+comm+'</td></tr>';
         }
         html+='</tbody></table>';
         document.getElementById('refList').innerHTML=html;
