@@ -296,11 +296,18 @@ function submitBooking(){
       });
     }
 
-    if(affiliate){
+       if(affiliate){
       sb.from('affiliates').select('*').eq('affiliate_code',affiliate).then(function(a){
         if(a.data && a.data.length>0){
           var aff=a.data[0];
-          var commission=pairs*20;
+
+          // Per-service commission
+          var COMMISSION={'Basic Wash':15,'Deep Clean':20,'Sole Whitening':20,'Premium Care':30};
+          var commission=0;
+          rows.forEach(function(r){
+            commission+=(COMMISSION[r.service]||0)*r.quantity;
+          });
+
           var newBalance=(aff.balance||0)+commission;
           sb.from('affiliates').update({balance:newBalance,total_earned:(aff.total_earned||0)+commission}).eq('id',aff.id).then(function(upd){
             if(upd.error){console.error('Affiliate update failed:',upd.error);}
