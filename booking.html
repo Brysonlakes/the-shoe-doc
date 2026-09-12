@@ -324,7 +324,7 @@ function submitBooking(){
       });
     }
 
-       if(affiliate){
+             if(affiliate){
       sb.from('affiliates').select('*').eq('affiliate_code',affiliate).then(function(a){
         if(a.data && a.data.length>0){
           var aff=a.data[0];
@@ -335,26 +335,25 @@ function submitBooking(){
             total_earned:(aff.total_earned||0)+commission
           }).eq('id',aff.id).then(function(upd){
             if(upd.error){
-              console.error('❌ Affiliate update failed:',upd.error);
+              console.error('Affiliate update failed:',upd.error);
             }else{
-              console.log('✅ Affiliate balance updated to R'+newBalance);
-              sendMail(aff.email,'💰 You earned R'+commission+'! - THE SHOE DOC',
-                emailLayout('💰 You Just Earned a Commission!',
+              console.log('Affiliate balance updated to R'+newBalance);
+              sendMail(aff.email,'You earned R'+commission+' - THE SHOE DOC',
+                emailLayout('You Just Earned a Commission!',
                   '<p style="margin-top:0">Hello <strong style="color:#D4AF37">'+aff.name+'</strong>,</p>'+
-                  '<p>Great news — a customer just used your affiliate code!</p>'+
+                  '<p>A customer just used your affiliate code!</p>'+
                   '<div style="background:#0f0f0f;border-radius:10px;padding:14px 18px;margin:14px 0;border-left:3px solid #D4AF37">'+
                     emailRow('Customer', name)+
-                    emailRow('Services', servicesList)+
                     emailRow('Total Pairs', pairs)+
                     emailRow('You Earned', 'R'+commission)+
                     emailRow('New Balance', 'R'+newBalance)+
                   '</div>'+
-                  '<p style="color:#aaa">Keep sharing your code <strong style="color:#D4AF37">'+aff.affiliate_code+'</strong> to earn more!</p>'
+                  '<p style="color:#aaa">Keep sharing your code!</p>'
                 ));
             }
           });
         }else{
-          console.warn('⚠️ No affiliate found with code:', affiliate);
+          console.warn('No affiliate found with code:', affiliate);
         }
       });
     }
